@@ -98,11 +98,11 @@ const TourDetailPage: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex mb-8 text-sm">
-          <Link to="/" className="text-gray-500 hover:text-primary">
+          <Link to="/" className="text-gray-500 hover:text-primary transition-colors duration-300">
             Trang chủ
           </Link>
           <span className="mx-2 text-gray-500">/</span>
-          <Link to="/tours" className="text-gray-500 hover:text-primary">
+          <Link to="/tours" className="text-gray-500 hover:text-primary transition-colors duration-300">
             Tour du lịch
           </Link>
           <span className="mx-2 text-gray-500">/</span>
@@ -113,7 +113,7 @@ const TourDetailPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
               <img
                 src={tour.images[0]}
                 alt={tour.title}
@@ -122,12 +122,10 @@ const TourDetailPage: React.FC = () => {
             </div>
 
             {/* Tour Info */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                    {tour.category}
-                  </span>
+                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">{tour.category}</span>
                   <span className="text-sm text-gray-500">{tour.duration}</span>
                   <div className="flex items-center text-yellow-400">
                     <span className="mr-1">★</span>
@@ -138,38 +136,26 @@ const TourDetailPage: React.FC = () => {
                   </div>
                 </div>
 
-                <h1 className="text-3xl font-bold mb-6">{tour.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">{tour.title}</h1>
 
                 {/* Tabs */}
-                <div className="border-b mb-6">
+                <div className="border-b mb-6 border-gray-200">
                   <nav className="flex gap-8">
                     <button
                       onClick={() => setActiveTab('overview')}
-                      className={`pb-4 ${
-                        activeTab === 'overview'
-                          ? 'border-b-2 border-primary text-primary'
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`pb-4 transition-colors duration-300 ${activeTab === 'overview' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                       Tổng quan
                     </button>
                     <button
                       onClick={() => setActiveTab('itinerary')}
-                      className={`pb-4 ${
-                        activeTab === 'itinerary'
-                          ? 'border-b-2 border-primary text-primary'
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`pb-4 transition-colors duration-300 ${activeTab === 'itinerary' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                       Lịch trình
                     </button>
                     <button
                       onClick={() => setActiveTab('pricing')}
-                      className={`pb-4 ${
-                        activeTab === 'pricing'
-                          ? 'border-b-2 border-primary text-primary'
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`pb-4 transition-colors duration-300 ${activeTab === 'pricing' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                       Giá & Điều khoản
                     </button>
@@ -181,10 +167,10 @@ const TourDetailPage: React.FC = () => {
                   {activeTab === 'overview' && (
                     <div>
                       <div
-                        className="prose max-w-none mb-8"
+                        className="prose max-w-none mb-8 text-gray-800 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: tour.description }}
                       />
-                      <h3 className="text-xl font-semibold mb-4">
+                      <h3 className="text-xl font-semibold mb-4 text-gray-800">
                         Điểm nổi bật
                       </h3>
                       <ul className="list-disc list-inside space-y-2 text-gray-600">
@@ -196,10 +182,10 @@ const TourDetailPage: React.FC = () => {
                   )}
 
                   {activeTab === 'itinerary' && (
-                    <div className="space-y-8">
+                    <div className="space-y-8 text-gray-800 leading-relaxed">
                       {tour.itinerary.map((day) => (
-                        <div key={day.day} className="border-b pb-6">
-                          <h3 className="text-xl font-semibold mb-4">
+                        <div key={day.day} className="border-b pb-6 border-gray-200 last:border-b-0">
+                          <h3 className="text-xl font-semibold mb-4 text-gray-900">
                             Ngày {day.day}: {day.title}
                           </h3>
                           <ul className="list-disc list-inside space-y-2 text-gray-600">
@@ -213,9 +199,9 @@ const TourDetailPage: React.FC = () => {
                   )}
 
                   {activeTab === 'pricing' && (
-                    <div>
+                    <div className="text-gray-800 leading-relaxed">
                       <div className="mb-8">
-                        <h3 className="text-xl font-semibold mb-4">Bao gồm</h3>
+                        <h3 className="text-xl font-semibold mb-4 text-gray-800">Bao gồm</h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-600">
                           {tour.pricing.includes.map((item, index) => (
                             <li key={index}>{item}</li>
@@ -223,7 +209,7 @@ const TourDetailPage: React.FC = () => {
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-4">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-800">
                           Không bao gồm
                         </h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-600">
@@ -242,27 +228,27 @@ const TourDetailPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Booking Card */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
               <div className="text-3xl font-bold text-primary mb-4">
                 {tour.price.toLocaleString()}đ
               </div>
               <Link
                 to={`/booking/${tour.id}`}
-                className="btn btn-primary w-full text-center"
+                className="btn btn-primary w-full text-center transition-colors duration-300 shadow-md hover:shadow-lg"
               >
                 Đặt tour ngay
               </Link>
             </div>
 
             {/* Related Tours */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-6">Tour liên quan</h2>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-6 text-gray-800">Tour liên quan</h2>
               <div className="space-y-6">
                 {tour.relatedTours.map((item) => (
                   <Link
                     key={item.id}
                     to={`/tours/${item.id}`}
-                    className="block group"
+                    className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
                   >
                     <div className="flex gap-4">
                       <img
@@ -271,7 +257,7 @@ const TourDetailPage: React.FC = () => {
                         className="w-24 h-24 object-cover rounded"
                       />
                       <div>
-                        <h3 className="font-semibold group-hover:text-primary">
+                        <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
                           {item.title}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">

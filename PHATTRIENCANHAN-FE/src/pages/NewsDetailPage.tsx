@@ -59,11 +59,11 @@ const NewsDetailPage: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex mb-8 text-sm">
-          <Link to="/" className="text-gray-500 hover:text-primary">
+          <Link to="/" className="text-gray-500 hover:text-primary transition-colors duration-300">
             Trang chủ
           </Link>
           <span className="mx-2 text-gray-500">/</span>
-          <Link to="/news" className="text-gray-500 hover:text-primary">
+          <Link to="/news" className="text-gray-500 hover:text-primary transition-colors duration-300">
             Tin tức
           </Link>
           <span className="mx-2 text-gray-500">/</span>
@@ -73,7 +73,7 @@ const NewsDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <article className="bg-white rounded-lg shadow-md overflow-hidden">
+            <article className="bg-white rounded-lg shadow-lg overflow-hidden">
               <img
                 src={news.image}
                 alt={news.title}
@@ -81,9 +81,7 @@ const NewsDetailPage: React.FC = () => {
               />
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                    {news.category}
-                  </span>
+                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">{news.category}</span>
                   <span className="text-sm text-gray-500">{news.date}</span>
                   <span className="text-sm text-gray-500">
                     Tác giả: {news.author}
@@ -92,9 +90,9 @@ const NewsDetailPage: React.FC = () => {
                     {news.views} lượt xem
                   </span>
                 </div>
-                <h1 className="text-3xl font-bold mb-6">{news.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">{news.title}</h1>
                 <div
-                  className="prose max-w-none"
+                  className="prose max-w-none text-gray-800 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: news.content }}
                 />
               </div>
@@ -103,14 +101,14 @@ const NewsDetailPage: React.FC = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-6">Tin tức liên quan</h2>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-6 text-gray-800">Tin tức liên quan</h2>
               <div className="space-y-6">
                 {news.relatedNews.map((item) => (
                   <Link
                     key={item.id}
                     to={`/news/${item.id}`}
-                    className="block group"
+                    className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
                   >
                     <div className="flex gap-4">
                       <img
@@ -119,7 +117,7 @@ const NewsDetailPage: React.FC = () => {
                         className="w-24 h-24 object-cover rounded"
                       />
                       <div>
-                        <h3 className="font-semibold group-hover:text-primary">
+                        <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
                           {item.title}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">

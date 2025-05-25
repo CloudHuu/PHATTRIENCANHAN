@@ -7,18 +7,19 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="bg-primary text-white py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Khám phá thế giới với News & Travel
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Khám phá thế giới với{' '}
+              <span className="text-secondary">News & Travel</span>
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-xl md:text-2xl mb-8 text-gray-100">
               Cập nhật tin tức mới nhất và đặt tour du lịch chất lượng cao
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/news" className="btn bg-white text-primary hover:bg-gray-100">
+              <Link to="/news" className="btn bg-white text-primary hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg">
                 Xem tin tức
               </Link>
-              <Link to="/tours" className="btn bg-secondary text-white hover:bg-secondary/90">
+              <Link to="/tours" className="btn bg-secondary text-white hover:bg-secondary/90 transition-colors duration-300 shadow-md hover:shadow-lg">
                 Khám phá tour
               </Link>
             </div>
@@ -29,10 +30,10 @@ const HomePage: React.FC = () => {
       {/* Featured News Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Tin tức nổi bật</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-900">Tin tức nổi bật</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* News Card 1 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="News"
@@ -40,11 +41,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/1" className="hover:text-primary">
+                  <Link to="/news/1" className="hover:text-primary transition-colors duration-300">
                     Tiêu đề tin tức 1
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Mô tả ngắn về tin tức 1...
                 </p>
                 <div className="flex justify-between items-center text-sm text-gray-500">
@@ -55,7 +56,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* News Card 2 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="News"
@@ -63,11 +64,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/2" className="hover:text-primary">
+                  <Link to="/news/2" className="hover:text-primary transition-colors duration-300">
                     Tiêu đề tin tức 2
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Mô tả ngắn về tin tức 2...
                 </p>
                 <div className="flex justify-between items-center text-sm text-gray-500">
@@ -78,7 +79,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* News Card 3 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="News"
@@ -86,11 +87,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/3" className="hover:text-primary">
+                  <Link to="/news/3" className="hover:text-primary transition-colors duration-300">
                     Tiêu đề tin tức 3
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Mô tả ngắn về tin tức 3...
                 </p>
                 <div className="flex justify-between items-center text-sm text-gray-500">
@@ -106,10 +107,10 @@ const HomePage: React.FC = () => {
       {/* Featured Tours Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Tour du lịch nổi bật</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-900">Tour du lịch nổi bật</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Tour Card 1 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="Tour"
@@ -117,11 +118,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/1" className="hover:text-primary">
+                  <Link to="/tours/1" className="hover:text-primary transition-colors duration-300">
                     Tour du lịch Đà Nẵng - Hội An
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An...
                 </p>
                 <div className="flex justify-between items-center">
@@ -132,7 +133,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Tour Card 2 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="Tour"
@@ -140,11 +141,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/2" className="hover:text-primary">
+                  <Link to="/tours/2" className="hover:text-primary transition-colors duration-300">
                     Tour du lịch Nha Trang
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Tận hưởng không khí biển và các hoạt động thú vị...
                 </p>
                 <div className="flex justify-between items-center">
@@ -155,7 +156,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Tour Card 3 */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
               <img
                 src="https://via.placeholder.com/400x250"
                 alt="Tour"
@@ -163,11 +164,11 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/3" className="hover:text-primary">
+                  <Link to="/tours/3" className="hover:text-primary transition-colors duration-300">
                     Tour du lịch Sapa
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-base">
                   Khám phá vẻ đẹp núi rừng và văn hóa dân tộc...
                 </p>
                 <div className="flex justify-between items-center">
@@ -183,13 +184,13 @@ const HomePage: React.FC = () => {
       {/* Call to Action */}
       <section className="py-16 bg-secondary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Sẵn sàng cho chuyến phiêu lưu tiếp theo?
           </h2>
           <p className="text-xl mb-8">
             Đăng ký ngay để nhận thông tin về các tour du lịch mới nhất
           </p>
-          <Link to="/tours" className="btn bg-white text-secondary hover:bg-gray-100">
+          <Link to="/tours" className="btn bg-white text-secondary hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg">
             Khám phá ngay
           </Link>
         </div>
@@ -198,4 +199,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;

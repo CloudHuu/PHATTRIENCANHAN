@@ -26,8 +26,8 @@ const ToursPage: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Page Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Khám phá tour du lịch</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">Khám phá tour du lịch</h1>
+          <p className="text-lg text-gray-600">
             Tìm kiếm và đặt tour du lịch phù hợp với bạn
           </p>
         </div>
@@ -35,22 +35,18 @@ const ToursPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-6">Bộ lọc</h2>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold mb-6 text-gray-800">Bộ lọc</h2>
 
               {/* Categories */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3">Danh mục</h3>
+                <h3 className="font-semibold mb-3 text-gray-700">Danh mục</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className={`block w-full text-left px-3 py-2 rounded-md ${
-                        selectedCategory === category.id
-                          ? 'bg-primary text-white'
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                      className={`block w-full text-left px-3 py-2 rounded-md transition-colors duration-300 ${selectedCategory === category.id ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       {category.name}
                     </button>
@@ -60,7 +56,7 @@ const ToursPage: React.FC = () => {
 
               {/* Price Range */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3">Khoảng giá</h3>
+                <h3 className="font-semibold mb-3 text-gray-700">Khoảng giá</h3>
                 <div className="px-3">
                   <input
                     type="range"
@@ -71,7 +67,7 @@ const ToursPage: React.FC = () => {
                     onChange={(e) =>
                       setPriceRange([priceRange[0], parseInt(e.target.value)])
                     }
-                    className="w-full"
+                    className="w-full accent-primary"
                   />
                   <div className="flex justify-between text-sm text-gray-500 mt-2">
                     <span>0đ</span>
@@ -82,17 +78,13 @@ const ToursPage: React.FC = () => {
 
               {/* Duration */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3">Thời gian</h3>
+                <h3 className="font-semibold mb-3 text-gray-700">Thời gian</h3>
                 <div className="space-y-2">
                   {durations.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => setDuration(item.id)}
-                      className={`block w-full text-left px-3 py-2 rounded-md ${
-                        duration === item.id
-                          ? 'bg-primary text-white'
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                      className={`block w-full text-left px-3 py-2 rounded-md transition-colors duration-300 ${duration === item.id ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       {item.name}
                     </button>
@@ -106,7 +98,7 @@ const ToursPage: React.FC = () => {
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Tour Card 1 */}
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
                 <img
                   src="https://via.placeholder.com/400x250"
                   alt="Tour"
@@ -120,11 +112,11 @@ const ToursPage: React.FC = () => {
                     <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/1" className="hover:text-primary">
+                    <Link to="/tours/1" className="hover:text-primary transition-colors duration-300">
                       Tour du lịch Đà Nẵng - Hội An
                     </Link>
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 mb-4 text-base">
                     Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An...
                   </p>
                   <div className="flex justify-between items-center">
@@ -133,7 +125,7 @@ const ToursPage: React.FC = () => {
                     </span>
                     <Link
                       to="/tours/1"
-                      className="btn btn-primary"
+                      className="btn btn-primary transition-colors duration-300"
                     >
                       Chi tiết
                     </Link>
@@ -142,7 +134,7 @@ const ToursPage: React.FC = () => {
               </div>
 
               {/* Tour Card 2 */}
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
                 <img
                   src="https://via.placeholder.com/400x250"
                   alt="Tour"
@@ -156,7 +148,7 @@ const ToursPage: React.FC = () => {
                     <span className="text-sm text-gray-500">4 ngày 3 đêm</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/2" className="hover:text-primary">
+                    <Link to="/tours/2" className="hover:text-primary transition-colors duration-300">
                       Tour du lịch Thái Lan
                     </Link>
                   </h3>
@@ -169,7 +161,7 @@ const ToursPage: React.FC = () => {
                     </span>
                     <Link
                       to="/tours/2"
-                      className="btn btn-primary"
+                      className="btn btn-primary transition-colors duration-300"
                     >
                       Chi tiết
                     </Link>
@@ -178,7 +170,7 @@ const ToursPage: React.FC = () => {
               </div>
 
               {/* Tour Card 3 */}
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                 <img
                   src="https://via.placeholder.com/400x250"
                   alt="Tour"
@@ -192,7 +184,7 @@ const ToursPage: React.FC = () => {
                     <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
                   </div>
                   <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/3" className="hover:text-primary">
+                    <Link to="/tours/3" className="hover:text-primary transition-colors duration-300">
                       Tour du lịch Nha Trang
                     </Link>
                   </h3>
@@ -205,7 +197,7 @@ const ToursPage: React.FC = () => {
                     </span>
                     <Link
                       to="/tours/3"
-                      className="btn btn-primary"
+                      className="btn btn-primary transition-colors duration-300"
                     >
                       Chi tiết
                     </Link>
@@ -217,19 +209,19 @@ const ToursPage: React.FC = () => {
             {/* Pagination */}
             <div className="flex justify-center mt-12">
               <nav className="flex items-center gap-2">
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
+                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
                   Trước
                 </button>
-                <button className="px-4 py-2 border rounded-md bg-primary text-white">
+                <button className="px-4 py-2 border rounded-md bg-primary text-white shadow-md transition-colors duration-300 hover:bg-primary/90">
                   1
                 </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
+                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
                   2
                 </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
+                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
                   3
                 </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
+                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
                   Sau
                 </button>
               </nav>

@@ -11,31 +11,31 @@ const Header: React.FC = () => {
     <header className="bg-white shadow-sm">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary">
+          <Link to="/" className="text-2xl font-bold text-primary transition-colors duration-300 hover:text-primary-dark">
             News & Travel
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/news" className="text-gray-600 hover:text-primary">
+            <Link to="/news" className="text-gray-600 transition-colors duration-300 hover:text-primary">
               Tin tức
             </Link>
-            <Link to="/tours" className="text-gray-600 hover:text-primary">
+            <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
               Tour du lịch
             </Link>
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <Link to="/profile" className="text-gray-600 hover:text-primary">
+                <Link to="/profile" className="text-gray-600 transition-colors duration-300 hover:text-primary">
                   {user?.name}
                 </Link>
-                <button className="btn btn-primary">Đăng xuất</button>
+                <button className="btn btn-primary transition-colors duration-300">Đăng xuất</button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link to="/login" className="text-gray-600 hover:text-primary">
+                <Link to="/login" className="text-gray-600 transition-colors duration-300 hover:text-primary">
                   Đăng nhập
                 </Link>
-                <Link to="/register" className="btn btn-primary">
+                <Link to="/register" className="btn btn-primary transition-colors duration-300">
                   Đăng ký
                 </Link>
               </div>
@@ -77,14 +77,14 @@ const Header: React.FC = () => {
           <div className="md:hidden mt-4 space-y-4">
             <Link
               to="/news"
-              className="block text-gray-600 hover:text-primary"
+              className="block text-gray-600 transition-colors duration-300 hover:text-primary"
               onClick={() => setIsMenuOpen(false)}
             >
               Tin tức
             </Link>
             <Link
               to="/tours"
-              className="block text-gray-600 hover:text-primary"
+              className="block text-gray-600 transition-colors duration-300 hover:text-primary"
               onClick={() => setIsMenuOpen(false)}
             >
               Tour du lịch
@@ -93,25 +93,25 @@ const Header: React.FC = () => {
               <>
                 <Link
                   to="/profile"
-                  className="block text-gray-600 hover:text-primary"
+                  className="block text-gray-600 transition-colors duration-300 hover:text-primary"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {user?.name}
                 </Link>
-                <button className="btn btn-primary w-full">Đăng xuất</button>
+                <button className="btn btn-primary w-full transition-colors duration-300">Đăng xuất</button>
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="block text-gray-600 hover:text-primary"
+                  className="block text-gray-600 transition-colors duration-300 hover:text-primary"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="btn btn-primary w-full block text-center"
+                  className="btn btn-primary w-full block text-center transition-colors duration-300"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Đăng ký

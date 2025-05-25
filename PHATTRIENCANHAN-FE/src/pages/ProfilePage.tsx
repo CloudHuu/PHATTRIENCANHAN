@@ -9,12 +9,12 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="py-12">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">Tài khoản của tôi</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900">Tài khoản của tôi</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
                   <span className="text-2xl text-gray-500">
@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
                   </span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">{user?.name}</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
                   <p className="text-gray-500">{user?.email}</p>
                 </div>
               </div>
@@ -30,31 +30,19 @@ const ProfilePage: React.FC = () => {
               <nav className="space-y-2">
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`w-full text-left px-4 py-2 rounded-md ${
-                    activeTab === 'profile'
-                      ? 'bg-primary text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-md transition-colors duration-300 ${activeTab === 'profile' ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
                   Thông tin cá nhân
                 </button>
                 <button
                   onClick={() => setActiveTab('bookings')}
-                  className={`w-full text-left px-4 py-2 rounded-md ${
-                    activeTab === 'bookings'
-                      ? 'bg-primary text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-md transition-colors duration-300 ${activeTab === 'bookings' ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
                   Tour đã đặt
                 </button>
                 <button
                   onClick={() => setActiveTab('settings')}
-                  className={`w-full text-left px-4 py-2 rounded-md ${
-                    activeTab === 'settings'
-                      ? 'bg-primary text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-md transition-colors duration-300 ${activeTab === 'settings' ? 'bg-primary text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
                   Cài đặt
                 </button>
@@ -65,8 +53,8 @@ const ProfilePage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {activeTab === 'profile' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-6">Thông tin cá nhân</h2>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold mb-6 text-gray-800">Thông tin cá nhân</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -75,7 +63,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="text"
                       value={user?.name || ''}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"
                       readOnly
                     />
                   </div>
@@ -86,7 +74,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="email"
                       value={user?.email || ''}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"
                       readOnly
                     />
                   </div>
@@ -95,8 +83,8 @@ const ProfilePage: React.FC = () => {
             )}
 
             {activeTab === 'bookings' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-6">Tour đã đặt</h2>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold mb-6 text-gray-800">Tour đã đặt</h2>
                 <div className="text-center text-gray-500 py-8">
                   Chưa có tour nào được đặt
                 </div>
@@ -104,12 +92,12 @@ const ProfilePage: React.FC = () => {
             )}
 
             {activeTab === 'settings' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-6">Cài đặt</h2>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold mb-6 text-gray-800">Cài đặt</h2>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between border-b pb-4 border-gray-200 last:border-b-0 last:pb-0">
                     <div>
-                      <h3 className="font-medium">Thông báo email</h3>
+                      <h3 className="font-medium text-gray-900">Thông báo email</h3>
                       <p className="text-sm text-gray-500">
                         Nhận thông báo về tour mới và khuyến mãi
                       </p>
@@ -129,4 +117,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage; 
+export default ProfilePage;

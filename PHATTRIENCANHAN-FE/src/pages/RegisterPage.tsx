@@ -29,7 +29,7 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Đăng ký tài khoản mới
@@ -38,7 +38,7 @@ const RegisterPage: React.FC = () => {
             Hoặc{' '}
             <Link
               to="/login"
-              className="font-medium text-primary hover:text-primary-dark"
+              className="font-medium text-primary hover:text-primary-dark transition-colors duration-300"
             >
               đăng nhập nếu đã có tài khoản
             </Link>
@@ -57,7 +57,7 @@ const RegisterPage: React.FC = () => {
                 required
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors duration-300"
                 placeholder="Nhập họ và tên"
               />
             </div>
@@ -72,7 +72,7 @@ const RegisterPage: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors duration-300"
                 placeholder="Nhập email"
               />
             </div>
@@ -87,7 +87,7 @@ const RegisterPage: React.FC = () => {
                 required
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors duration-300"
                 placeholder="Nhập số điện thoại"
               />
             </div>
@@ -102,7 +102,7 @@ const RegisterPage: React.FC = () => {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors duration-300"
                 placeholder="Nhập mật khẩu"
               />
             </div>
@@ -117,7 +117,7 @@ const RegisterPage: React.FC = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors duration-300"
                 placeholder="Nhập lại mật khẩu"
               />
             </div>
@@ -126,7 +126,7 @@ const RegisterPage: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-300 shadow-md hover:shadow-lg"
             >
               Đăng ký
             </button>
@@ -148,7 +148,7 @@ const RegisterPage: React.FC = () => {
           <div className="mt-6 grid grid-cols-2 gap-3">
             <button
               type="button"
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-300"
             >
               <span className="sr-only">Đăng ký với Google</span>
               <svg
@@ -165,7 +165,7 @@ const RegisterPage: React.FC = () => {
 
             <button
               type="button"
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-300"
             >
               <span className="sr-only">Đăng ký với Facebook</span>
               <svg
