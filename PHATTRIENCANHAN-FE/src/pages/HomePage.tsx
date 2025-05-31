@@ -9,19 +9,20 @@ const HomePage: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Khám phá thế giới với{' '}
-              <span className="text-secondary">News & Travel</span>
+              Khám phá thế giới cùng với{' '}
+              <span className="text-secondary">benthanhtourist</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-100">
               Cập nhật tin tức mới nhất và đặt tour du lịch chất lượng cao
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/news" className="btn bg-white text-primary hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg">
+              <Link to="/news" className="btn bg-white text-red-500 hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg">
                 Xem tin tức
               </Link>
-              <Link to="/tours" className="btn bg-secondary text-white hover:bg-secondary/90 transition-colors duration-300 shadow-md hover:shadow-lg">
+              <Link to="/tours" className="btn bg-secondary text-red-500 hover:bg-secondary/90 transition-colors duration-300 shadow-md hover:shadow-lg">
                 Khám phá tour
               </Link>
+
             </div>
           </div>
         </div>
@@ -41,9 +42,10 @@ const HomePage: React.FC = () => {
               />
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/1" className="hover:text-primary transition-colors duration-300">
-                    Tiêu đề tin tức 1
-                  </Link>
+                 <Link to="/news/1" className="block hover:text-primary transition-colors">
+                <img src="/image/danang.jpg" alt="News"/>
+                HÀNH TRÌNH KIẾN TẠO MIỀN TRUNG: ĐÀ NẴNG - SƠN TRÀ - HỘI AN - BÀ NÀ - CÙ LAO CHÀM
+              </Link>
                 </h3>
                 <p className="text-gray-600 mb-4 text-base">
                   Mô tả ngắn về tin tức 1...
