@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4">News & Travel</h3>
+           <img src="/image/logo1.png" alt="Logo" className="w-110 h-14" />
             <p className="text-gray-400">
               Cung cấp thông tin tin tức và tour du lịch chất lượng cao cho mọi người.
             </p>
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} News & Travel. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BenThanhTourist. All rights reserved.</p>
         </div>
       </div>
     </footer>

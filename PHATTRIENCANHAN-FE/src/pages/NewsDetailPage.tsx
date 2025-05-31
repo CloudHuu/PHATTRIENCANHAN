@@ -12,15 +12,20 @@ const NewsDetailPage: React.FC = () => {
     date: '20/03/2024',
     author: 'Admin',
     views: 100,
-    image: 'https://via.placeholder.com/1200x600',
+    image: '/image/danang0.jpg',
     content: `
+  
       <p>Đà Nẵng - thành phố biển xinh đẹp nằm ở miền Trung Việt Nam, là một điểm đến lý tưởng cho du khách trong và ngoài nước. Với những bãi biển tuyệt đẹp, văn hóa phong phú và ẩm thực đặc sắc, Đà Nẵng đang ngày càng khẳng định vị thế của mình trên bản đồ du lịch thế giới.</p>
-
+      <h2>
+      <img src="/image/danang3.jpg" alt="News"/>
+      Đến với Đà Nẵng một thành phố được mệnh danh là “ Thành phố đáng sống nhất Việt Nam ”. Tại nơi đây Quý khách có thể thỏa sức mình ngụp lặn trong làn nước biếc, nô giỡn với những con sóng và tắm nắng trên bãi cát trắng mịn. Mẹ thiên nhiên đã ưu ái ban tặng cho địa danh này không chỉ là cảnh quan thiên nhiên tươi đẹp như đèo Hải Vân với danh xưng Thiên hạ đệ nhất hùng quang, mà còn là những hải sản tươi sống, tươi ngon như tôm, mực, ghẹ, mực trứng và đặc biệt để níu giữ chân du khách không thể không kể đến đặc sản Cao Lầu, sợi mỳ ăn cùng thịt xá xíu, chan vừa đủ nước sốt rồi thêm ít rau xanh. Từ xa xưa, Cao Lầu đã trở thành linh hồn ẩm thực văn hóa Đà Nẵng. Đà Nẵng còn níu chân du khách bởi những con người chân chất với nụ cười thân thiện, mến khách , khí hậu mát mẻ quanh năm… ai đã từng đặt chân đến nơi đây sẽ nhớ mãi không quên và quay trở lại.</h2>
       <h2>Những điểm đến không thể bỏ qua</h2>
       <p>1. Bãi biển Mỹ Khê: Được tạp chí Forbes bình chọn là một trong những bãi biển đẹp nhất thế giới, Mỹ Khê nổi tiếng với bãi cát trắng mịn và làn nước trong xanh.</p>
-      <p>2. Bán đảo Sơn Trà: Nơi đây không chỉ có ngọn hải đăng cổ kính mà còn là điểm ngắm toàn cảnh thành phố tuyệt đẹp.</p>
-      <p>3. Ngũ Hành Sơn: Quần thể núi đá vôi với những hang động và chùa chiền cổ kính.</p>
-
+      <img src="/image/danang1.jpg" alt="News"/>
+      <p>2. Bán Đảo Sơn Trà – được mệnh danh là lá phổi xanh của Đà Nẵng, là ngôi nhà chung của rất nhiều loài động vật quý hiếm như vooc chà vá chân nâu, mèo rừng…,</p>
+      <img src="/image/danang.jpg" alt="News"/>
+      <p>3. Tiếp tục tham quan Làng Pháp – được xem như là một Châu Âu thu nhỏ trong lòng thành phố. Đặc biệt nhất là tham quan và chụp ảnh Cầu Vàng - có kiến trúc độc nhất vô nhị với đôi bàn tay khổng lồ nâng đỡ Cầu Vàng vươn ra đón anh chiều tà, tạo nên khung cảnh hoàng hôn tuyệt đẹp.</p>
+      <img src="/image/danang2.jpg" alt="News"/>
       <h2>Ẩm thực đặc sắc</h2>
       <p>Đà Nẵng nổi tiếng với nhiều món ăn đặc sắc như:</p>
       <ul>

@@ -12,16 +12,28 @@ const Header: React.FC = () => {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-primary transition-colors duration-300 hover:text-primary-dark">
-            News & Travel
+            <img src="/image/logo1.png" alt="Logo" className="w-110 h-12" />
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/news" className="text-gray-600 transition-colors duration-300 hover:text-primary">
-              Tin tức
+              TRANG CHỦ
             </Link>
             <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
-              Tour du lịch
+              DU LỊCH
+            </Link>
+            <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
+              INBOUND
+            </Link>
+            <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
+              TRAVALTIPS
+            </Link>
+            <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
+              GIỚI THIỆU
+            </Link>
+            <Link to="/tours" className="text-gray-600 transition-colors duration-300 hover:text-primary">
+              LIÊN HỆ
             </Link>
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
