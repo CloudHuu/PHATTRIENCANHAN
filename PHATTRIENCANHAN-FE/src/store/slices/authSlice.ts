@@ -7,6 +7,8 @@ interface User {
   fullName?: string;
   phone?: string | null;
   avatar?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
 }
 
 interface AuthState {
@@ -38,6 +40,8 @@ const authSlice = createSlice({
         fullName: action.payload.user.fullName,
         phone: action.payload.user.phone,
         avatar: action.payload.user.avatar,
+        dateOfBirth: action.payload.user.dateOfBirth,
+        gender: action.payload.user.gender,
       };
       state.token = action.payload.token;
       state.isAuthenticated = true;
@@ -50,8 +54,13 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 
-export const { setCredentials, logout, setLoading } = authSlice.actions;
+export const { setCredentials, logout, setLoading, updateUserProfile } = authSlice.actions;
 export default authSlice.reducer; 

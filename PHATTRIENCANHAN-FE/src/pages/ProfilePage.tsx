@@ -1,10 +1,227 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
+import { updateUserProfile, setCredentials } from '../store/slices/authSlice';
+
+// Define the type for editable profile data
+interface EditableProfileData {
+  fullName?: string;
+  dateOfBirth?: string; // Assuming date is stored as string initially
+  gender?: 'male' | 'female' | 'other'; // Assuming gender can be these values
+  // image?: File; // For file upload, handling will be more complex
+  phone?: string;
+  avatarPreviewUrl?: string; // To store the URL for preview
+  avatarFile?: File; // To store the selected file
+}
+
+// Define the type for the data sent to the update profile API
+interface UpdateProfileDto {
+    gender?: 'male' | 'female' | 'other';
+    dateOfBirth?: string;
+    fullName?: string;
+    phone?: string;
+    // Assuming backend accepts base64 string for image
+    image?: string; // Base64 string of the image
+}
 
 const ProfilePage: React.FC = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'wishlist' | 'wallet'>('profile');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingUser, setIsFetchingUser] = useState(true); // State to track initial user fetch
+
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
+
+  // State to manage editable form data
+  const [editableData, setEditableData] = useState<EditableProfileData>({
+    fullName: user?.fullName || '',
+    dateOfBirth: user?.dateOfBirth || '',
+    gender: user?.gender || undefined,
+    phone: user?.phone || '',
+    avatarPreviewUrl: user?.avatar || '', // Use existing avatar for initial preview
+    avatarFile: undefined,
+  });
+
+  // Effect to fetch user data when component mounts or token changes
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!token) {
+        setIsFetchingUser(false);
+        // Optionally clear user data in Redux if token is missing
+        // dispatch(logout());
+        return;
+      }
+
+      setIsFetchingUser(true);
+      try {
+        const API_BASE_URL = 'http://localhost:3000';
+        const response = await fetch(`${API_BASE_URL}/auth/me`, { // Assume /auth/me endpoint
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          // Handle errors like invalid token (e.g., redirect to login)
+          console.error('Failed to fetch user data:', response.status, response.statusText);
+          // Optionally clear token/user and redirect
+          // dispatch(logout());
+          return;
+        }
+
+        const userData = await response.json();
+        console.log('Fetched user data on mount/token change:', userData);
+        // Update Redux state with the fetched data
+        // Use setCredentials here as we are potentially setting the full user object and confirming token validity
+        dispatch(setCredentials({ user: userData, token: token }));
+        
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Handle network errors etc.
+      } finally {
+        setIsFetchingUser(false);
+      }
+    };
+
+    // Only fetch if user is null or token changes
+    // If user exists, this effect still runs on token change to re-fetch and validate token
+    // if (!user || token) { // Consider carefully the condition for fetching
+        fetchUserData();
+    // }
+
+  }, [token, dispatch]); // Depend on token and dispatch
+
+  // Update editableData when user data changes (triggered after fetch or update API call)
+  useEffect(() => {
+    console.log('User data updated in Redux, updating editableData:', user);
+    setEditableData({
+      fullName: user?.fullName || '',
+      dateOfBirth: user?.dateOfBirth || '',
+      gender: user?.gender || undefined,
+      phone: user?.phone || '',
+      avatarPreviewUrl: user?.avatar || '', // Update preview URL from new user data
+      // Keep avatarFile as undefined unless a new one is selected after this effect runs
+      avatarFile: undefined,
+    });
+  }, [user]); // Depend on user
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEditableData(prevData => ({ ...prevData, [name]: value }));
+  };
+
+  const handleGenderChange = (gender: 'male' | 'female' | 'other') => {
+      setEditableData(prevData => ({ ...prevData, gender }));
+  }
+
+  const handleAvatarClick = () => {
+      fileInputRef.current?.click(); // Click the hidden file input
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          if (file.size > 1024 * 1024) { // Check file size (1MB)
+              alert('Kích thước ảnh không được vượt quá 1MB.');
+              // Clear the selected file
+              if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+              }
+              setEditableData(prevData => ({ ...prevData, avatarFile: undefined, avatarPreviewUrl: user?.avatar || '' })); // Revert preview to original
+              return;
+          }
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setEditableData(prevData => ({
+                  ...prevData,
+                  avatarFile: file,
+                  avatarPreviewUrl: reader.result as string, // Store Base64 or Data URL for preview
+              }));
+          };
+          reader.readAsDataURL(file); // Read file as Data URL (Base64)
+      }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!token) {
+      alert('User not authenticated. Please log in.');
+      return;
+    }
+
+    setIsLoading(true);
+    const updateData: UpdateProfileDto = {
+      gender: editableData.gender,
+      dateOfBirth: editableData.dateOfBirth,
+      fullName: editableData.fullName,
+      phone: editableData.phone,
+      // Include image data if a new file was selected
+      image: editableData.avatarFile ? editableData.avatarPreviewUrl : undefined, // Send Base64 if file exists
+    };
+
+    // Debug logs
+    console.log('Sending update data:', updateData);
+    console.log('Current user:', user);
+    console.log('Token:', token);
+
+    try {
+      const API_BASE_URL = 'http://localhost:3000';
+      console.log('Making API call to:', `${API_BASE_URL}/auth/update`);
+      
+      const response = await fetch(`${API_BASE_URL}/auth/update`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        let errorMessage = 'Cập nhật thông tin thất bại';
+        
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || errorMessage;
+        } catch (e) {
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const updatedUserData = await response.json();
+      console.log('Updated user data from server:', updatedUserData);
+      
+      // Update Redux store with new user data using the specific action
+      // This will trigger the second useEffect to update editableData
+      dispatch(updateUserProfile(updatedUserData));
+      
+      alert('Thông tin đã được cập nhật thành công!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi cập nhật thông tin.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Show loading state while fetching initial user data
+  if (isFetchingUser) {
+      return <div>Đang tải thông tin người dùng...</div>; // Or a more sophisticated loader
+  }
+
+  // Render null or redirect if user is not loaded after fetching attempt
+  if (!user) {
+      return <div>Không thể tải thông tin người dùng hoặc người dùng chưa đăng nhập.</div>; // Or redirect to login
+  }
 
   return (
     <div className="py-12">
@@ -17,9 +234,14 @@ const ProfilePage: React.FC = () => {
               {/* User Info Section - Matching Image */}
               <div className="flex flex-col items-center pb-6 border-b border-gray-200 mb-6">
                 {/* Avatar with Yellow Border */}
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4 border-4 border-yellow-400">
-                  {/* Display first initial or a default icon */}
-                  {user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'H'} {/* Use 'H' as default if no name/email initial available */}
+                <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4 border-4 border-yellow-400 overflow-hidden">
+                  {editableData.avatarPreviewUrl ? (
+                      <img src={editableData.avatarPreviewUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
+                  ) : (
+                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-white text-5xl font-bold">
+                          {user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'H'}
+                      </div>
+                  )}
                 </div>
                 {/* Username and Shield Icon with Tooltip */}
                 <div className="flex items-center mb-2"> {/* Keep flex items-center */}
@@ -35,7 +257,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                {/* Full Name */}
+                {/* Full Name in sidebar - Use user state directly for display */}
                 <p className="text-gray-600 mb-4">{user?.fullName || 'Họ tên'}</p>
                 {/* Edit button with Pen Icon - Adjusted roundedness */}
                 <button className="mt-2 px-4 py-2 bg-orange-500 text-white rounded-full shadow hover:bg-orange-600 transition-colors duration-300 flex items-center"> {/* Changed rounded-md to rounded-full */}
@@ -73,10 +295,12 @@ const ProfilePage: React.FC = () => {
                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /> {/* Simpler email paths */}
                     </svg>
                     {user?.email || 'Chưa cập nhật'}
-                    {/* Verified Email Icon */}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 h-4 w-4 ml-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"> {/* Keep the original verified icon */}
+                    {/* Verified Email Icon (Placeholder) */}
+                     {/*
+                     <svg xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 h-4 w-4 ml-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
+                    */}
                   </p>
                 </div>
               </div>
@@ -91,32 +315,32 @@ const ProfilePage: React.FC = () => {
           <div className="lg:col-span-3">
             {/* Tab Navigation */}
             <div className="border-b border-gray-200 mb-2">
-              <nav className="-mb-px flex space-x-8">
-                <button
-                  onClick={() => setActiveTab('profile')}
-                  className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                >
-                  Chỉnh sửa thông tin
-                </button>
-                <button
-                  onClick={() => setActiveTab('bookings')}
-                  className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bookings' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                >
-                  Lịch sử đặt tour
-                </button>
-                <button
-                  onClick={() => setActiveTab('wishlist')}
-                  className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'wishlist' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                >
-                  Danh sách yêu thích
-                </button>
-                <button
-                  onClick={() => setActiveTab('wallet')}
-                  className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'wallet' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                >
-                  Ví cá nhân
-                </button>
-              </nav>
+                <nav className="-mb-px flex space-x-8">
+                    <button
+                        onClick={() => setActiveTab('profile')}
+                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Chỉnh sửa thông tin
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('bookings')}
+                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bookings' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Lịch sử đặt tour
+                    </button>
+                     <button
+                        onClick={() => setActiveTab('wishlist')}
+                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'wishlist' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Danh sách yêu thích
+                    </button>
+                     <button
+                        onClick={() => setActiveTab('wallet')}
+                        className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'wallet' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Ví cá nhân
+                    </button>
+                </nav>
             </div>
 
             {/* Tab Content - Thông tin cá nhân */}
@@ -124,94 +348,157 @@ const ProfilePage: React.FC = () => {
               <div className="bg-white rounded-lg shadow-lg p-6">
 
                 <div className="flex justify-between items-start"> {/* Ensure items are aligned to the top */}
-                  {/* Use flex-grow on the inner div to distribute space */}
-                  <div className="flex space-x-8 w-full"> {/* Increased space-x and ensure full width usage */}
-                    {/* Tên người dùng and Ngày sinh */}
-                    <div className="flex flex-col flex-1"> {/* Use flex-1 to allow column to grow */}
-                      <label className="block text-sm font-medium text-gray-700 mb-1">* Tên người dùng</label>
-                      <input type="text" value={user?.email?.split('@')[0] || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                    {/* Use flex-grow on the inner div to distribute space */}
+                    <div className="flex space-x-8 w-full"> {/* Increased space-x and ensure full width usage */}
+                         {/* Tên người dùng and Ngày sinh */}
+                         <div className="flex flex-col flex-1"> {/* Use flex-1 to allow column to grow */}
+                             <label className="block text-sm font-medium text-gray-700 mb-1">* Tên người dùng</label>
+                             <input type="text" value={user?.email?.split('@')[0] || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
 
-                      {/* Ngày sinh */}
-                      <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">* Ngày sinh</label>
-                      <div className="relative">
-                        <input type="text" placeholder="Chọn ngày sinh" className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-primary focus:border-primary" />
-                        {/* Calendar Icon */}
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
+                             {/* Ngày sinh */}
+                             <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">* Ngày sinh</label>
+                             <div className="relative">
+                                 <input
+                                     type="text"
+                                     placeholder="Chọn ngày sinh"
+                                     className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-primary focus:border-primary"
+                                     name="dateOfBirth"
+                                     value={editableData.dateOfBirth}
+                                     onChange={handleInputChange}
+                                 />
+                                  {/* Calendar Icon */}
+                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                             </div>
+                         </div>
+
+                          {/* Họ và tên and Giới tính */} 
+                          <div className="flex flex-col flex-1 space-y-4"> {/* Group right fields and avatar, allow column to grow */}
+                             {/* Họ và tên */}
+                             <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                             <input
+                                 type="text"
+                                 value={editableData.fullName}
+                                 className="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"
+                                 name="fullName"
+                                 onChange={handleInputChange}
+                             />
+
+                             {/* Giới tính */}
+                             <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">Giới tính</label>
+                             <div className="flex items-center space-x-4 pt-2"> 
+                                  <label className="inline-flex items-center">
+                                     <input
+                                         type="radio"
+                                         name="gender"
+                                         value="male"
+                                         className="form-radio text-primary"
+                                         checked={editableData.gender === 'male'}
+                                         onChange={() => handleGenderChange('male')}
+                                     />
+                                     <span className="ml-2 text-gray-700">Nam</span>
+                                 </label>
+                                  <label className="inline-flex items-center">
+                                     <input
+                                         type="radio"
+                                         name="gender"
+                                         value="female"
+                                         className="form-radio text-primary"
+                                         checked={editableData.gender === 'female'}
+                                         onChange={() => handleGenderChange('female')}
+                                     />
+                                     <span className="ml-2 text-gray-700">Nữ</span>
+                                 </label>
+                             </div>
+
+                             {/* Avatar Upload Area - Placed below Gender */}
+                             <div className="flex flex-col items-center space-y-2 mt-6"> {/* Adjusted spacing and added top margin */}
+                                 {/* Circular Upload Area */}
+                                  {/* Clickable div to trigger file input */}
+                                  <div
+                                      className="flex-shrink-0 w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer overflow-hidden"
+                                      onClick={handleAvatarClick}
+                                  >
+                                      {editableData.avatarPreviewUrl ? (
+                                          <img src={editableData.avatarPreviewUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
+                                      ) : (
+                                          <>
+                                              {/* Plus Icon */}
+                                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                              </svg>
+                                              {/* Text */}
+                                              <p className="mt-1 text-sm">Tải ảnh lên</p>
+                                          </>
+                                      )}
+                                  </div>
+
+                                 {/* Hidden file input */}
+                                  <input
+                                      type="file"
+                                      ref={fileInputRef}
+                                      accept="image/png, image/jpeg"
+                                      onChange={handleFileChange}
+                                      className="hidden"
+                                  />
+
+                                 {/* File type info */}
+                                 <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 1MB</p>
+                             </div>
+
+                         </div>
                     </div>
-
-                    {/* Họ và tên and Giới tính */}
-                    <div className="flex flex-col flex-1"> {/* Use flex-1 to allow column to grow */}
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                      <input type="text" value={user?.fullName || ''} className="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary" />
-
-                      {/* Giới tính */}
-                      <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">Giới tính</label>
-                      <div className="flex items-center space-x-4 pt-2">
-                        <label className="inline-flex items-center">
-                          <input type="radio" name="gender" value="male" className="form-radio text-primary" checked />
-                          <span className="ml-2 text-gray-700">Nam</span>
-                        </label>
-                        <label className="inline-flex items-center">
-                          <input type="radio" name="gender" value="female" className="form-radio text-primary" />
-                          <span className="ml-2 text-gray-700">Nữ</span>
-                        </label>
-                      </div>
-
-                      {/* Avatar Upload Area - Placed below Gender, adjusted spacing */}
-                      <div className="flex flex-col items-center space-y-2 mt-5"> {/* Adjusted spacing and increased top margin slightly to move below gender */}
-                        {/* Circular Upload Area */}
-                        <div className="flex-shrink-0 w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer">
-                          {/* Plus Icon */}
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                          {/* Text */}
-                          <p className="mt-1 text-sm">Tải ảnh lên</p>
-                        </div>
-                        {/* File type info */}
-                        <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 1MB</p>
-                      </div>
-
-                    </div>
-                  </div>
                 </div>
 
-                {/* Adjusted spacing for sections below the top row */}
-                <div className="space-y-4 mt-[-3rem]"> {/* Adjusted vertical space and increased negative top margin to move content up slightly more */}
-                  {/* Email */}
-                  <div className="w-1/3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">* Tài khoản Email</label>
-                    <input type="email" value={user?.email || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
-                    {/* Verified label */}
-                    <p className="mt-1 text-sm text-green-600">Email đã được xác thực</p>
-                  </div>
-
-                  {/* Phone Number and Save Button Row */}
-                  <div className="flex items-end space-x-4">
+                {/* Email and Phone sections */}
+                <div className="space-y-6 mt-6"> {/* Adjusted top margin and vertical space */}
+                    {/* Email */}
                     <div className="w-1/3">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                      <div className="flex space-x-2">
-                        <input type="tel" value={user?.phone || ''} placeholder="Nhập số điện thoại" className="flex-grow px-2 py-2 border rounded-lg focus:ring-primary focus:border-primary" />
-                        {/* Verification button */}
-                        <button className="flex items-center px-3 py-1 text-xs font-semibold bg-red-200 text-red-700 rounded-full shadow hover:bg-red-300 transition-colors duration-300 whitespace-nowrap">
-                          {/* Icon */}
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-                          </svg>
-                          <span>Xác Thực Ngay!</span>
-                        </button>
-                      </div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">* Tài khoản Email</label>
+                         <input type="email" value={user?.email || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                         {/* Verified label */}
+                         <p className="mt-1 text-sm text-green-600">Email đã được xác thực</p>
                     </div>
-                  </div>
+
+                    {/* Phone Number and Save Button Row */}
+                     <div className="flex items-end space-x-4">
+                        <div className="w-1/3">
+                           <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                           <div className="flex space-x-2">
+                              <input
+                                  type="tel"
+                                  value={editableData.phone}
+                                  placeholder="Nhập số điện thoại"
+                                  className="flex-grow px-2 py-2 border rounded-lg focus:ring-primary focus:border-primary"
+                                  name="phone"
+                                  onChange={handleInputChange}
+                              />
+                              {/* Verification button */}
+                              <button className="flex items-center px-3 py-1 text-xs font-semibold bg-red-200 text-red-700 rounded-full shadow hover:bg-red-300 transition-colors duration-300 whitespace-nowrap">
+                                {/* Icon */}
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+                                </svg>
+                                <span>Xác Thực Ngay!</span>
+                              </button>
+                           </div>
+                        </div>
+                    </div>
 
                 </div>
 
                 {/* Save Changes button */}
                 <div className="flex justify-end mt-4">
-                  <button className="px-6 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition-colors duration-300">Lưu thay đổi</button>
+                  <button
+                      onClick={handleSaveProfile}
+                      disabled={isLoading}
+                      className={`px-6 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition-colors duration-300 ${
+                        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                  >
+                      {isLoading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
+                  </button>
                 </div>
 
               </div>
