@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const slides = [
   {
@@ -40,12 +41,12 @@ const HeroSlider = () => {
         <h1 className="text-4xl md:text-6xl font-bold mb-4">{title}</h1>
         <p className="text-xl mb-6">{subtitle}</p>
         <div className="flex justify-center gap-4">
-          <button className="bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+          <Link to="/news" className="bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
             Xem tin tức
-          </button>
-          <button className="bg-secondary text-black px-6 py-2 rounded-full font-semibold hover:bg-secondary/90 transition">
+          </Link>
+          <Link to="/tours" className="bg-secondary text-black px-6 py-2 rounded-full font-semibold hover:bg-secondary/90 transition">
             Khám phá tour
-          </button>
+          </Link>
         </div>
       </div>
     </section>

@@ -17,10 +17,6 @@ const Header: React.FC = () => {
             href: "/tours",
         },
         {
-            name: "INBOUND",
-            href: "/tours",
-        },
-        {
             name: "tin tức",
             href: "/news",
         },
