@@ -10,10 +10,10 @@ export class User {
   email: string;
 
   @Column()
-  firstName: string;
+  fullName: string;
 
-  @Column()
-  lastName: string;
+  @Column({ nullable: true })
+  phone: string;
 
   @Column()
   @Exclude()
@@ -25,9 +25,12 @@ export class User {
   @Column({ nullable: true })
   resetPasswordExpires: Date;
 
+  @Column({ default: 'user' })
+  role: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

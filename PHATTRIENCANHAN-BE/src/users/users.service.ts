@@ -24,9 +24,15 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
+    // Combine firstName and lastName to create fullName
+    const fullName = `${registerDto.firstName} ${registerDto.lastName}`.trim();
+
     const user = this.usersRepository.create({
-      ...registerDto,
+      email: registerDto.email,
       password: hashedPassword,
+      fullName: fullName,
+      phone: registerDto.phoneNumber, // Assuming phoneNumber is in registerDto
+      // Add other fields if necessary
     });
 
     return this.usersRepository.save(user);
