@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/slices/authSlice';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
   });
+
+  const [loading, setLoading] = useState(false); // State for loading status
+  const [error, setError] = useState<string | null>(null); // State for overall error message
+  const [success, setSuccess] = useState<string | null>(null); // State for success message
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({}); // State for validation errors
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,14 +26,107 @@ const RegisterPage: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear specific field error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    if (!formData.firstName.trim()) {
+      errors.firstName = 'Tên không được để trống.';
+    }
+    if (!formData.lastName.trim()) {
+      errors.lastName = 'Họ không được để trống.';
+    }
+    if (!formData.email.trim()) {
+      errors.email = 'Email không được để trống.';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
+      errors.email = 'Email không đúng định dạng.';
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = 'Số điện thoại không được để trống.';
+    } else if (!/^\d{10,11}$/.test(formData.phone)) { // Basic phone number format (10 or 11 digits)
+        errors.phone = 'Số điện thoại không đúng định dạng.';
+    }
+    if (!formData.password) {
+      errors.password = 'Mật khẩu không được để trống.';
+    } else if (formData.password.length < 6) { // Minimum password length
+        errors.password = 'Mật khẩu phải ít nhất 6 ký tự.';
+    }
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'Xác nhận mật khẩu không được để trống.';
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Mật khẩu và xác nhận mật khẩu không khớp.';
+    }
+    return errors;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, this would send data to an API
-    console.log('Register data:', formData);
-    alert('Đăng ký thành công!');
-    navigate('/login');
+    setLoading(true);
+    setError(null); // Clear previous overall error
+    setSuccess(null); // Clear previous success messages
+    setFormErrors({}); // Clear previous form errors
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // TODO: Replace with your actual backend API URL
+      const response = await fetch('http://localhost:3000/auth/register', { // Assuming your backend runs on http://localhost:3000
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle API errors
+         // Check if data is an object and has a message property, otherwise use a default error
+        const errorMessage = data && typeof data === 'object' && data.message ? data.message : 'Đăng ký thất bại.';
+        throw new Error(errorMessage);
+      }
+
+      // Handle successful registration
+      console.log('Registration successful:', data);
+      setSuccess('Đăng ký thành công! Vui lòng đăng nhập.');
+
+      // Assuming backend response includes user and token, update Redux state
+      if (data.user && data.access_token) {
+          localStorage.setItem('accessToken', data.access_token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          dispatch(setCredentials({ user: data.user, token: data.access_token }));
+      }
+
+      // Optional: Redirect to login page after a short delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Redirect after 2 seconds
+
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Đã xảy ra lỗi khi đăng ký.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,19 +149,34 @@ const RegisterPage: React.FC = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Họ và tên
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                Tên
               </label>
               <input
-                id="fullName"
-                name="fullName"
+                id="firstName"
+                name="firstName"
                 type="text"
-                required
-                value={formData.fullName}
+                value={formData.firstName}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out"
-                placeholder="Nhập họ và tên"
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.firstName ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
+                placeholder="Nhập tên"
               />
+               {formErrors.firstName && <p className="mt-1 text-red-500 text-xs">{formErrors.firstName}</p>}
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                Họ
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.lastName ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
+                placeholder="Nhập họ"
+              />
+               {formErrors.lastName && <p className="mt-1 text-red-500 text-xs">{formErrors.lastName}</p>}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -69,12 +186,12 @@ const RegisterPage: React.FC = () => {
                 id="email"
                 name="email"
                 type="email"
-                required
                 value={formData.email}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out"
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.email ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
                 placeholder="Nhập email"
               />
+               {formErrors.email && <p className="mt-1 text-red-500 text-xs">{formErrors.email}</p>}
             </div>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
@@ -84,12 +201,12 @@ const RegisterPage: React.FC = () => {
                 id="phone"
                 name="phone"
                 type="tel"
-                required
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out"
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.phone ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
                 placeholder="Nhập số điện thoại"
               />
+               {formErrors.phone && <p className="mt-1 text-red-500 text-xs">{formErrors.phone}</p>}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -99,12 +216,12 @@ const RegisterPage: React.FC = () => {
                 id="password"
                 name="password"
                 type="password"
-                required
                 value={formData.password}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out"
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.password ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
                 placeholder="Nhập mật khẩu"
               />
+               {formErrors.password && <p className="mt-1 text-red-500 text-xs">{formErrors.password}</p>}
             </div>
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
@@ -114,19 +231,25 @@ const RegisterPage: React.FC = () => {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out"
+                className={`appearance-none relative block w-full px-4 py-3 border ${formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-300 ease-in-out`}
                 placeholder="Nhập lại mật khẩu"
               />
+               {formErrors.confirmPassword && <p className="mt-1 text-red-500 text-xs">{formErrors.confirmPassword}</p>}
             </div>
           </div>
+
+           {/* Display loading, error, or success message */}
+          {loading && <p className="text-center text-blue-600 text-sm">Đang đăng ký...</p>}
+          {error && <p className="text-center text-red-500 text-sm">{error}</p>}
+          {success && <p className="text-center text-green-600 text-sm">{success}</p>}
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              disabled={loading} // Disable button while loading
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Đăng ký
             </button>

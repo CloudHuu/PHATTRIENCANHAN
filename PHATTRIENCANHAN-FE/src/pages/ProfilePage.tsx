@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
                   </span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">{user?.fullName || user?.name}</h2>
                   <p className="text-gray-500">{user?.email}</p>
                 </div>
               </div>
@@ -62,7 +62,7 @@ const ProfilePage: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      value={user?.name || ''}
+                      value={user?.fullName || user?.name || ''}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"
                       readOnly
                     />
@@ -74,6 +74,17 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="email"
                       value={user?.email || ''}
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Số điện thoại
+                    </label>
+                    <input
+                      type="tel"
+                      value={user?.phone || ''}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"
                       readOnly
                     />

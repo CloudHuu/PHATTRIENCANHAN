@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/slices/authSlice';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  const [loading, setLoading] = useState(false); // State for loading status
+  const [error, setError] = useState<string | null>(null); // State for overall error message
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({}); // State for validation errors
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -14,14 +21,78 @@ const LoginPage: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+     // Clear specific field error when user starts typing
+     if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    if (!formData.email.trim()) {
+      errors.email = 'Email không được để trống.';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
+      errors.email = 'Email không đúng định dạng.';
+    }
+    if (!formData.password) {
+      errors.password = 'Mật khẩu không được để trống.';
+    }
+    return errors;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, this would send data to an API
-    console.log('Login data:', formData);
-    alert('Đăng nhập thành công!');
-    navigate('/');
+    setLoading(true);
+    setError(null); // Clear previous overall errors
+    setFormErrors({}); // Clear previous form errors
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // TODO: Replace with your actual backend API URL
+      const response = await fetch('http://localhost:3000/auth/login', { // Assuming your backend runs on http://localhost:3000
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle API errors
+         // Check if data is an object and has a message property, otherwise use a default error
+        const errorMessage = data && typeof data === 'object' && data.message ? data.message : 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.';
+        throw new Error(errorMessage);
+      }
+
+      // Handle successful login
+      console.log('Login successful:', data);
+      // Store access token and user info
+      localStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Dispatch action to update Redux state
+      dispatch(setCredentials({ user: data.user, token: data.access_token }));
+
+      alert('Đăng nhập thành công!'); // Consider using a more user-friendly notification
+      navigate('/'); // Redirect to homepage or dashboard
+
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Đã xảy ra lỗi khi đăng nhập.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,12 +122,13 @@ const LoginPage: React.FC = () => {
                 id="email"
                 name="email"
                 type="email"
-                required
+                // required // Removing HTML required
                 value={formData.email}
                 onChange={handleInputChange}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out"
+                className={`appearance-none rounded-xl relative block w-full px-4 py-3 border ${formErrors.email ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out`}
                 placeholder="Email"
               />
+               {formErrors.email && <p className="mt-1 text-red-500 text-xs">{formErrors.email}</p>}
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
@@ -66,12 +138,13 @@ const LoginPage: React.FC = () => {
                 id="password"
                 name="password"
                 type="password"
-                required
+                // required // Removing HTML required
                 value={formData.password}
                 onChange={handleInputChange}
-                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out"
+                className={`appearance-none rounded-xl relative block w-full px-4 py-3 border ${formErrors.password ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out`}
                 placeholder="Mật khẩu"
               />
+               {formErrors.password && <p className="mt-1 text-red-500 text-xs">{formErrors.password}</p>}
             </div>
           </div>
 
@@ -101,10 +174,15 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Display loading or error message */}
+          {loading && <p className="text-center text-blue-600 text-sm">Đang đăng nhập...</p>}
+          {error && <p className="text-center text-red-500 text-sm">{error}</p>}
+
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              disabled={loading} // Disable button while loading
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Đăng nhập
             </button>

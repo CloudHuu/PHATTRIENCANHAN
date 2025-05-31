@@ -19,6 +19,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 const queryClient = new QueryClient();
 
@@ -38,8 +39,9 @@ function App() {
               <Route path={"contacts"} element={<ContactPage/>} />
               <Route path="booking/:tourId" element={<BookingPage />} />
               <Route path="profile" element={<ProfilePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+              <Route path="change-password" element={<ChangePasswordPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<RegisterPage />} />
             </Route>
           </Routes>
         </Router>
