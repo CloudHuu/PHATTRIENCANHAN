@@ -1,32 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import HeroSlider from '../components/HeroSlider';
 const HomePage: React.FC = () => {
-  return (
+   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-primary text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Khám phá thế giới cùng với{' '}
-              <span className="text-secondary">benthanhtourist</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-100">
-              Cập nhật tin tức mới nhất và đặt tour du lịch chất lượng cao
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/news" className="btn bg-white text-red-500 hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg">
-                Xem tin tức
-              </Link>
-              <Link to="/tours" className="btn bg-secondary text-red-500 hover:bg-secondary/90 transition-colors duration-300 shadow-md hover:shadow-lg">
-                Khám phá tour
-              </Link>
-
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Thay phần Hero Section cũ bằng slider 3 ảnh */}
+      <HeroSlider/>
+{/* <section
+  className="relative bg-cover bg-center bg-no-repeat text-white py-32"
+  // style={{ backgroundImage: `url('/image/danang1.jpg')` }}
+>
+  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+  <div className="relative z-10 container mx-auto px-4 text-center">
+    <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+      Khám phá thế giới cùng với{' '}
+      <span className="text-secondary">benthanhtourist</span>
+    </h1>
+    <p className="text-xl md:text-2xl mb-8 text-gray-100">
+      Cập nhật tin tức mới nhất và đặt tour du lịch chất lượng cao
+    </p>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <Link
+        to="/news"
+        className="btn bg-white text-black hover:bg-gray-100 transition-colors duration-300 shadow-md hover:shadow-lg"
+      >
+        Xem tin tức
+      </Link>
+      <Link
+        to="/tours"
+        className="btn bg-secondary text-black hover:bg-secondary/90 transition-colors duration-300 shadow-md hover:shadow-lg"
+      >
+        Khám phá tour
+      </Link>
+    </div>
+  </div>
+</section> */}
 
       {/* Featured News Section */}
       <section className="py-12 bg-gray-50">
