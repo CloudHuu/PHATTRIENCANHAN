@@ -29,28 +29,32 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Featured News Section */}
-      <section className="py-16">
+      <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-900">Tin tức nổi bật</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-teal-700">
+            Tin Tức Nổi Bật
+          </h2>
+          <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-teal-500 scrollbar-track-gray-200">
             {/* News Card 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
               <img
-                src="https://via.placeholder.com/400x250"
-                alt="News"
-                className="w-full h-48 object-cover"
+                  src="/image/danang.jpg"
+                  alt="Đà Nẵng Tour"
+                  className="w-1/3 object-cover rounded-l-lg"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                 <Link to="/news/1" className="block hover:text-primary transition-colors">
-                <img src="/image/danang.jpg" alt="News"/>
-                HÀNH TRÌNH KIẾN TẠO MIỀN TRUNG: ĐÀ NẴNG - SƠN TRÀ - HỘI AN - BÀ NÀ - CÙ LAO CHÀM
-              </Link>
+              <div className="p-4 flex-1">
+                <h3 className="text-lg font-semibold mb-2">
+                  <Link
+                      to="/news/1"
+                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
+                  >
+                    Hành Trình Kiến Tạo Miền Trung: Đà Nẵng - Sơn Trà - Hội An
+                  </Link>
                 </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Mô tả ngắn về tin tức 1...
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Khám phá vẻ đẹp miền Trung với hành trình qua Đà Nẵng, Sơn Trà, Hội An, Bà Nà và Cù Lao Chàm.
                 </p>
-                <div className="flex justify-between items-center text-sm text-gray-500">
+                <div className="flex justify-between items-center text-xs text-gray-500">
                   <span>20/03/2024</span>
                   <span>100 lượt xem</span>
                 </div>
@@ -58,22 +62,25 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* News Card 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
               <img
-                src="https://via.placeholder.com/400x250"
-                alt="News"
-                className="w-full h-48 object-cover"
+                  src="/image/halong.jpg"
+                  alt="Hạ Long Tour"
+                  className="w-1/3 object-cover rounded-l-lg"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/2" className="hover:text-primary transition-colors duration-300">
-                    Tiêu đề tin tức 2
+              <div className="p-4 flex-1">
+                <h3 className="text-lg font-semibold mb-2">
+                  <Link
+                      to="/news/2"
+                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
+                  >
+                    Khám Phá Vịnh Hạ Long - Di Sản Thiên Nhiên Thế Giới
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Mô tả ngắn về tin tức 2...
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Trải nghiệm du thuyền trên Vịnh Hạ Long, khám phá hang động và cảnh quan tuyệt đẹp.
                 </p>
-                <div className="flex justify-between items-center text-sm text-gray-500">
+                <div className="flex justify-between items-center text-xs text-gray-500">
                   <span>19/03/2024</span>
                   <span>85 lượt xem</span>
                 </div>
@@ -81,22 +88,25 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* News Card 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
               <img
-                src="https://via.placeholder.com/400x250"
-                alt="News"
-                className="w-full h-48 object-cover"
+                  src="/image/phuquoc.jpg"
+                  alt="Phú Quốc Tour"
+                  className="w-1/3 object-cover rounded-l-lg"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/news/3" className="hover:text-primary transition-colors duration-300">
-                    Tiêu đề tin tức 3
+              <div className="p-4 flex-1">
+                <h3 className="text-lg font-semibold mb-2">
+                  <Link
+                      to="/news/3"
+                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
+                  >
+                    Thư Giãn Tại Thiên Đường Phú Quốc
                   </Link>
                 </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Mô tả ngắn về tin tức 3...
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  Nghỉ dưỡng tại Phú Quốc với bãi biển xanh mướt và ẩm thực độc đáo.
                 </p>
-                <div className="flex justify-between items-center text-sm text-gray-500">
+                <div className="flex justify-between items-center text-xs text-gray-500">
                   <span>18/03/2024</span>
                   <span>120 lượt xem</span>
                 </div>

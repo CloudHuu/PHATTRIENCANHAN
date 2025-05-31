@@ -17,6 +17,8 @@ import BookingPage from './pages/BookingPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ function App() {
               <Route path="news/:id" element={<NewsDetailPage />} />
               <Route path="tours" element={<ToursPage />} />
               <Route path="tours/:id" element={<TourDetailPage />} />
+              <Route path={"about"} element={<AboutPage/>} />
+              <Route path={"contacts"} element={<ContactPage/>} />
               <Route path="booking/:tourId" element={<BookingPage />} />
               <Route path="profile" element={<ProfilePage />} />
             <Route path="/login" element={<LoginPage />} />
