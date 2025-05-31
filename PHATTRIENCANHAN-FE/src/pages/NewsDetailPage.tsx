@@ -1,63 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
+interface NewsDetailItem {
+  id: string;
+  title: string;
+  category: string;
+  date: string; // Consider using Date type
+  author: string;
+  views: number;
+  image: string;
+  content: string;
+  relatedNews?: { id: string; title: string; image: string; date: string }[]; // Consider using Date type
+}
 
 const NewsDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
-  // Mock data - In real app, this would come from an API
-  const news = {
-    id: id,
-    title: 'Khám phá vẻ đẹp của Đà Nẵng',
-    category: 'Du lịch',
-    date: '20/03/2024',
-    author: 'Admin',
-    views: 100,
-    image: '/image/danang0.jpg',
-    content: `
-  
-      <p>Đà Nẵng - thành phố biển xinh đẹp nằm ở miền Trung Việt Nam, là một điểm đến lý tưởng cho du khách trong và ngoài nước. Với những bãi biển tuyệt đẹp, văn hóa phong phú và ẩm thực đặc sắc, Đà Nẵng đang ngày càng khẳng định vị thế của mình trên bản đồ du lịch thế giới.</p>
-      <h2>
-      <img src="/image/danang3.jpg" alt="News"/>
-      Đến với Đà Nẵng một thành phố được mệnh danh là “ Thành phố đáng sống nhất Việt Nam ”. Tại nơi đây Quý khách có thể thỏa sức mình ngụp lặn trong làn nước biếc, nô giỡn với những con sóng và tắm nắng trên bãi cát trắng mịn. Mẹ thiên nhiên đã ưu ái ban tặng cho địa danh này không chỉ là cảnh quan thiên nhiên tươi đẹp như đèo Hải Vân với danh xưng Thiên hạ đệ nhất hùng quang, mà còn là những hải sản tươi sống, tươi ngon như tôm, mực, ghẹ, mực trứng và đặc biệt để níu giữ chân du khách không thể không kể đến đặc sản Cao Lầu, sợi mỳ ăn cùng thịt xá xíu, chan vừa đủ nước sốt rồi thêm ít rau xanh. Từ xa xưa, Cao Lầu đã trở thành linh hồn ẩm thực văn hóa Đà Nẵng. Đà Nẵng còn níu chân du khách bởi những con người chân chất với nụ cười thân thiện, mến khách , khí hậu mát mẻ quanh năm… ai đã từng đặt chân đến nơi đây sẽ nhớ mãi không quên và quay trở lại.</h2>
-      <h2>Những điểm đến không thể bỏ qua</h2>
-      <p>1. Bãi biển Mỹ Khê: Được tạp chí Forbes bình chọn là một trong những bãi biển đẹp nhất thế giới, Mỹ Khê nổi tiếng với bãi cát trắng mịn và làn nước trong xanh.</p>
-      <img src="/image/danang1.jpg" alt="News"/>
-      <p>2. Bán Đảo Sơn Trà – được mệnh danh là lá phổi xanh của Đà Nẵng, là ngôi nhà chung của rất nhiều loài động vật quý hiếm như vooc chà vá chân nâu, mèo rừng…,</p>
-      <img src="/image/danang.jpg" alt="News"/>
-      <p>3. Tiếp tục tham quan Làng Pháp – được xem như là một Châu Âu thu nhỏ trong lòng thành phố. Đặc biệt nhất là tham quan và chụp ảnh Cầu Vàng - có kiến trúc độc nhất vô nhị với đôi bàn tay khổng lồ nâng đỡ Cầu Vàng vươn ra đón anh chiều tà, tạo nên khung cảnh hoàng hôn tuyệt đẹp.</p>
-      <img src="/image/danang2.jpg" alt="News"/>
-      <h2>Ẩm thực đặc sắc</h2>
-      <p>Đà Nẵng nổi tiếng với nhiều món ăn đặc sắc như:</p>
-      <ul>
-        <li>Mì Quảng</li>
-        <li>Bánh tráng cuốn thịt heo</li>
-        <li>Bún chả cá</li>
-        <li>Bánh xèo</li>
-      </ul>
+  const [news, setNews] = useState<NewsDetailItem | null>(null); // State to hold news data
+  const [loading, setLoading] = useState(true); // State to handle loading status
+  const [error, setError] = useState<string | null>(null); // State to handle errors
 
-      <h2>Văn hóa và lễ hội</h2>
-      <p>Thành phố này còn nổi tiếng với các lễ hội văn hóa đặc sắc như:</p>
-      <ul>
-        <li>Lễ hội pháo hoa quốc tế</li>
-        <li>Lễ hội ẩm thực</li>
-        <li>Các lễ hội truyền thống của người dân địa phương</li>
-      </ul>
-    `,
-    relatedNews: [
-      {
-        id: '2',
-        title: 'Lễ hội đèn lồng Hội An',
-        image: 'https://via.placeholder.com/400x250',
-        date: '19/03/2024',
-      },
-      {
-        id: '3',
-        title: 'Đặc sản ẩm thực miền Trung',
-        image: 'https://via.placeholder.com/400x250',
-        date: '18/03/2024',
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchNewsDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // TODO: Replace with actual API call to fetch news detail by id
+        // Example: const response = await fetch(`/api/news/${id}`);
+        // const data: NewsDetailItem = await response.json();
+
+        // Simulate fetching data
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+        // Mock data structure matching the previous mock, replace with fetched data
+        const mockNewsData: NewsDetailItem = {
+          id: id || '',
+          title: 'Khám phá vẻ đẹp của Đà Nẵng (Fetched)',
+          category: 'Du lịch',
+          date: '20/03/2024',
+          author: 'Admin',
+          views: 100,
+          image: '/image/danang0.jpg',
+          content: '<p>Nội dung chi tiết của bài viết...</p>',
+          relatedNews: [
+            {
+              id: '2',
+              title: 'Tin tức liên quan 1 (Fetched)',
+              image: 'https://via.placeholder.com/400x250',
+              date: '19/03/2024',
+            },
+          ],
+        };
+
+        setNews(mockNewsData);
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchNewsDetail();
+    }
+  }, [id]); // Rerun effect when id changes
+
+   // Show loading or error state
+  if (loading) return <div className="text-center py-12">Đang tải chi tiết tin tức...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">Lỗi: {error}</div>;
+  if (!news) return <div className="text-center py-12">Không tìm thấy tin tức.</div>;
 
   return (
     <div className="py-12">
@@ -106,34 +117,36 @@ const NewsDetailPage: React.FC = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-6 text-gray-800">Tin tức liên quan</h2>
-              <div className="space-y-6">
-                {news.relatedNews.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={`/news/${item.id}`}
-                    className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
-                  >
-                    <div className="flex gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-24 h-24 object-cover rounded"
-                      />
-                      <div>
-                        <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item.date}
-                        </p>
+            {news.relatedNews && news.relatedNews.length > 0 && (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-bold mb-6 text-gray-800">Tin tức liên quan</h2>
+                <div className="space-y-6">
+                  {news.relatedNews.map((item, index) => (
+                    <Link
+                      key={item.id}
+                      to={`/news/${item.id}`}
+                      className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                    >
+                      <div className="flex gap-4">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <div>
+                          <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {item.date}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

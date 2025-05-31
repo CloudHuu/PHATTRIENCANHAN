@@ -1,97 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
+interface TourDetail {
+  id: string;
+  title: string;
+  category: string;
+  duration: string;
+  price: number;
+  rating?: number;
+  reviews?: number;
+  images: string[];
+  description: string;
+  highlights: string[];
+  itinerary: { day: number; title: string; activities: string[] }[];
+  pricing: { includes: string[]; excludes: string[] };
+  relatedTours?: { id: string; title: string; image: string; price: number; duration: string }[];
+}
 
 const TourDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'overview' | 'itinerary' | 'pricing'>('overview');
 
-  // Mock data - In real app, this would come from an API
-  const tour = {
-    id: id,
-    title: 'Tour du lịch Đà Nẵng - Hội An',
-    category: 'Tour trong nước',
-    duration: '3 ngày 2 đêm',
-    price: 2500000,
-    rating: 4.5,
-    reviews: 128,
-    images: [
-      'https://via.placeholder.com/1200x600',
-      'https://via.placeholder.com/1200x600',
-      'https://via.placeholder.com/1200x600',
-    ],
-    description: `
-      <p>Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An trong chuyến du lịch 3 ngày 2 đêm đầy thú vị. Tour bao gồm các điểm tham quan nổi tiếng, ẩm thực đặc sắc và trải nghiệm văn hóa độc đáo.</p>
-    `,
-    highlights: [
-      'Tham quan bãi biển Mỹ Khê - một trong những bãi biển đẹp nhất thế giới',
-      'Khám phá phố cổ Hội An - di sản văn hóa thế giới',
-      'Thưởng thức ẩm thực đặc sắc của miền Trung',
-      'Trải nghiệm văn hóa địa phương',
-    ],
-    itinerary: [
-      {
-        day: 1,
-        title: 'Đà Nẵng - Bãi biển Mỹ Khê',
-        activities: [
-          'Đón khách tại sân bay Đà Nẵng',
-          'Ăn trưa tại nhà hàng địa phương',
-          'Tham quan bãi biển Mỹ Khê',
-          'Ăn tối và nghỉ đêm tại khách sạn',
-        ],
-      },
-      {
-        day: 2,
-        title: 'Hội An - Phố cổ',
-        activities: [
-          'Ăn sáng tại khách sạn',
-          'Di chuyển đến Hội An',
-          'Tham quan phố cổ Hội An',
-          'Ăn tối và nghỉ đêm tại Hội An',
-        ],
-      },
-      {
-        day: 3,
-        title: 'Hội An - Đà Nẵng',
-        activities: [
-          'Ăn sáng tại khách sạn',
-          'Mua sắm tại chợ Hội An',
-          'Ăn trưa và trả phòng',
-          'Tiễn khách tại sân bay Đà Nẵng',
-        ],
-      },
-    ],
-    pricing: {
-      includes: [
-        'Vé máy bay khứ hồi',
-        'Khách sạn 3-4 sao',
-        'Ăn uống theo chương trình',
-        'Vé tham quan các điểm du lịch',
-        'Hướng dẫn viên chuyên nghiệp',
-        'Bảo hiểm du lịch',
-      ],
-      excludes: [
-        'Chi phí cá nhân',
-        'Đồ uống trong bữa ăn',
-        'Phí phát sinh ngoài chương trình',
-      ],
-    },
-    relatedTours: [
-      {
-        id: '2',
-        title: 'Tour du lịch Nha Trang',
-        image: 'https://via.placeholder.com/400x250',
-        price: 3200000,
-        duration: '3 ngày 2 đêm',
-      },
-      {
-        id: '3',
-        title: 'Tour du lịch Sapa',
-        image: 'https://via.placeholder.com/400x250',
-        price: 2800000,
-        duration: '3 ngày 2 đêm',
-      },
-    ],
-  };
+  const [tour, setTour] = useState<TourDetail | null>(null); // State to hold tour data
+  const [loading, setLoading] = useState(true); // State to handle loading status
+  const [error, setError] = useState<string | null>(null); // State to handle errors
+
+  useEffect(() => {
+    const fetchTourDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // TODO: Replace with actual API call to fetch tour detail by id
+        // Example: const response = await fetch(`/api/tours/${id}`);
+        // const data: TourDetail = await response.json();
+        
+        // Simulate fetching data
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+        // Mock data structure matching the previous mock, replace with fetched data
+        const mockTourData: TourDetail = {
+            id: id || '',
+            title: 'Tour du lịch Đà Nẵng - Hội An (Fetched)',
+            category: 'Tour trong nước',
+            duration: '3 ngày 2 đêm',
+            price: 2500000,
+            rating: 4.5,
+            reviews: 128,
+            images: [
+              'https://via.placeholder.com/1200x600',
+              'https://via.placeholder.com/1200x600',
+              'https://via.placeholder.com/1200x600',
+            ],
+            description: '<p>Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An trong chuyến du lịch 3 ngày 2 đêm đầy thú vị.</p>',
+            highlights: [
+              'Tham quan bãi biển Mỹ Khê',
+              'Khám phá phố cổ Hội An',
+            ],
+            itinerary: [
+              { day: 1, title: 'Ngày 1', activities: ['Hoạt động 1', 'Hoạt động 2'] },
+              { day: 2, title: 'Ngày 2', activities: ['Hoạt động 3'] },
+            ],
+            pricing: {
+              includes: ['Vé máy bay', 'Khách sạn'],
+              excludes: ['Chi phí cá nhân'],
+            },
+             relatedTours: [
+                {
+                  id: '2',
+                  title: 'Tour liên quan 1',
+                  image: 'https://via.placeholder.com/400x250',
+                  price: 3000000,
+                  duration: '3 ngày',
+                },
+             ]
+          };
+
+        setTour(mockTourData); // Set fetched data
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchTourDetail();
+    }
+  }, [id]); // Rerun effect when id changes
+
+  // Show loading or error state
+  if (loading) return <div className="text-center py-12">Đang tải chi tiết tour...</div>;
+  if (error) return <div className="text-center py-12 text-red-500">Lỗi: {error}</div>;
+  if (!tour) return <div className="text-center py-12">Không tìm thấy tour.</div>;
 
   return (
     <div className="py-12">
@@ -174,36 +174,36 @@ const TourDetailPage: React.FC = () => {
                         Điểm nổi bật
                       </h3>
                       <ul className="list-disc list-inside space-y-2 text-gray-600">
-                        {tour.highlights.map((highlight, index) => (
+                        {tour.highlights.map((highlight: string, index: number) => (
                           <li key={index}>{highlight}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {activeTab === 'itinerary' && (
+                  {activeTab === 'itinerary' && ( tour.itinerary && tour.itinerary.length > 0 ? (
                     <div className="space-y-8 text-gray-800 leading-relaxed">
-                      {tour.itinerary.map((day) => (
-                        <div key={day.day} className="border-b pb-6 border-gray-200 last:border-b-0">
+                      {tour.itinerary.map((day: { day: number; title: string; activities: string[] }, index: number) => (
+                        <div key={index} className="border-b pb-6 border-gray-200 last:border-b-0">
                           <h3 className="text-xl font-semibold mb-4 text-gray-900">
                             Ngày {day.day}: {day.title}
                           </h3>
                           <ul className="list-disc list-inside space-y-2 text-gray-600">
-                            {day.activities.map((activity, index) => (
+                            {day.activities.map((activity: string, index: number) => (
                               <li key={index}>{activity}</li>
                             ))}
                           </ul>
                         </div>
                       ))}
                     </div>
-                  )}
+                  ) : (<p>Không có thông tin lịch trình.</p>))}
 
-                  {activeTab === 'pricing' && (
+                  {activeTab === 'pricing' && ( tour.pricing ? (
                     <div className="text-gray-800 leading-relaxed">
                       <div className="mb-8">
                         <h3 className="text-xl font-semibold mb-4 text-gray-800">Bao gồm</h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-600">
-                          {tour.pricing.includes.map((item, index) => (
+                          {tour.pricing.includes.map((item: string, index: number) => (
                             <li key={index}>{item}</li>
                           ))}
                         </ul>
@@ -213,13 +213,13 @@ const TourDetailPage: React.FC = () => {
                           Không bao gồm
                         </h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-600">
-                          {tour.pricing.excludes.map((item, index) => (
+                          {tour.pricing.excludes.map((item: string, index: number) => (
                             <li key={index}>{item}</li>
                           ))}
                         </ul>
                       </div>
                     </div>
-                  )}
+                  ) : (<p>Không có thông tin giá.</p>))}
                 </div>
               </div>
             </div>
@@ -241,37 +241,39 @@ const TourDetailPage: React.FC = () => {
             </div>
 
             {/* Related Tours */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-6 text-gray-800">Tour liên quan</h2>
-              <div className="space-y-6">
-                {tour.relatedTours.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={`/tours/${item.id}`}
-                    className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
-                  >
-                    <div className="flex gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-24 h-24 object-cover rounded"
-                      />
-                      <div>
-                        <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item.duration}
-                        </p>
-                        <p className="text-primary font-semibold mt-1">
-                          {item.price.toLocaleString()}đ
-                        </p>
+            {tour.relatedTours && tour.relatedTours.length > 0 && (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-bold mb-6 text-gray-800">Tour liên quan</h2>
+                <div className="space-y-6">
+                  {tour.relatedTours.map((item: { id: string; title: string; image: string; price: number; duration: string }, index: number) => (
+                    <Link
+                      key={item.id}
+                      to={`/tours/${item.id}`}
+                      className="block group transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                    >
+                      <div className="flex gap-4">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <div>
+                          <h3 className="font-semibold group-hover:text-primary transition-colors duration-300">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {item.duration}
+                          </p>
+                          <p className="text-primary font-semibold mt-1">
+                            {item.price.toLocaleString()}đ
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
