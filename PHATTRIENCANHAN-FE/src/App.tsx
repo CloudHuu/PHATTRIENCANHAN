@@ -7,6 +7,9 @@ import { store } from './store';
 // Layouts
 import MainLayout from './layouts/MainLayout';
 
+// Components
+import AuthInitializer from './components/AuthInitializer';
+
 // Pages
 import HomePage from './pages/HomePage';
 import NewsPage from './pages/NewsPage';
@@ -26,6 +29,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <Provider store={store}>
+      <AuthInitializer />
       <QueryClientProvider client={queryClient}>
         <Router>
           <Routes>

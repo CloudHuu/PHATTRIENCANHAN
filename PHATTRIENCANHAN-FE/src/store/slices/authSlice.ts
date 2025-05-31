@@ -31,7 +31,14 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ user: User; token: string }>
     ) => {
-      state.user = action.payload.user;
+      state.user = {
+        id: action.payload.user.id,
+        email: action.payload.user.email,
+        name: action.payload.user.name,
+        fullName: action.payload.user.fullName,
+        phone: action.payload.user.phone,
+        avatar: action.payload.user.avatar,
+      };
       state.token = action.payload.token;
       state.isAuthenticated = true;
     },
