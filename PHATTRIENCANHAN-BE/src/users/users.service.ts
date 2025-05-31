@@ -1,10 +1,11 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { MoreThan } from 'typeorm';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -48,6 +49,67 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  // New method to find user by ID
+  async findOneById(userId: number): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id: userId });
+  }
+
+  async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
+    console.log(`Attempting to update user with ID: ${userId}`);
+    console.log('Update data:', updateUserDto);
+
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Destructure dateOfBirth separately
+    const { dateOfBirth, ...otherUpdateData } = updateUserDto;
+
+    // Handle dateOfBirth string to Date object conversion and validation
+    if (dateOfBirth !== undefined) {
+      if (dateOfBirth === null || dateOfBirth.trim() === '') {
+        // Set to null if the client explicitly sends null or empty string
+        user.dateOfBirth = null; // This is now allowed due to nullable: true in entity
+      } else {
+        // Attempt to parse date string in YYYY-MM-DD format
+        const parts = dateOfBirth.split('-');
+        // Ensure we have three parts and they are numbers
+        if (parts.length === 3 && !isNaN(parseInt(parts[0])) && !isNaN(parseInt(parts[1])) && !isNaN(parseInt(parts[2]))) {
+          // Create Date object using UTC to avoid timezone issues affecting the date itself
+          // Month is 0-indexed in Date constructor
+          const year = parseInt(parts[0]);
+          const month = parseInt(parts[1]) - 1;
+          const day = parseInt(parts[2]);
+          const date = new Date(Date.UTC(year, month, day));
+
+          // Check if the created date components match the input components
+          // This helps validate if the date string was valid (e.g., handles invalid month/day like 2000-02-30)
+          if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month || date.getUTCDate() !== day) {
+             throw new BadRequestException('Invalid date value for dateOfBirth. Please use YYYY-MM-DD format with valid date components.');
+          }
+
+          // Assign the valid Date object
+          user.dateOfBirth = date;
+
+        } else {
+           // If parsing failed or format is incorrect
+           throw new BadRequestException('Invalid date format for dateOfBirth. Expected YYYY-MM-DD.');
+        }
+      }
+    }
+
+    // Update other user properties from the DTO
+    Object.assign(user, otherUpdateData);
+
+    const savedUser = await this.usersRepository.save(user);
+    console.log('User saved successfully:', savedUser);
+    return savedUser;
   }
 
   async updateResetPasswordToken(email: string, token: string, expires: Date): Promise<void> {

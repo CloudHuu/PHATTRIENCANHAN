@@ -4,9 +4,13 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { User } from '../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as nodemailer from 'nodemailer';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+// Removed unused import UpdateUserDto
+// import { UpdateUserDto } from './dto/update-user.dto'; // Update import path if needed later
 
 @Injectable()
 export class AuthService {
@@ -35,7 +39,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user: User = await this.usersService.findByEmail(loginDto.email);
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
@@ -49,12 +53,13 @@ export class AuthService {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        phone: user.phone,
       },
     };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-    const user = await this.usersService.findByEmail(forgotPasswordDto.email);
+    const user: User = await this.usersService.findByEmail(forgotPasswordDto.email);
     const token = crypto.randomBytes(32).toString('hex');
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
@@ -78,5 +83,11 @@ export class AuthService {
   async resetPassword(token: string, newPassword: string) {
     await this.usersService.resetPassword(token, newPassword);
     return { message: 'Password has been reset successfully' };
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const updatedUser = await this.usersService.update(userId, updateProfileDto);
+    const { password, ...result } = updatedUser;
+    return result;
   }
 } 

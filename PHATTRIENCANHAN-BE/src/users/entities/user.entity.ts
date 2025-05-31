@@ -15,6 +15,15 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  @Column({ nullable: true })
+  gender: string;
+
+  @Column({ nullable: true })
+  image: string;
+
+  @Column({ nullable: true, type: 'date' })
+  dateOfBirth: Date | null;
+
   @Column()
   @Exclude()
   password: string;
@@ -22,8 +31,8 @@ export class User {
   @Column({ nullable: true })
   resetPasswordToken: string;
 
-  @Column({ nullable: true })
-  resetPasswordExpires: Date;
+  @Column({ nullable: true, type: 'datetime2' })
+  resetPasswordExpires: Date | null;
 
   @Column({ default: 'user' })
   role: string;
