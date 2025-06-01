@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { updateUserProfile, setCredentials } from '../store/slices/authSlice';
+import API_BASE_URL from '../config/api';
 
 // Define the type for editable profile data
 interface EditableProfileData {
@@ -36,7 +37,6 @@ const ProfilePage: React.FC = () => {
     type: null,
   }); // State for custom notification
 
-  const API_BASE_URL = 'http://localhost:3000'; // Add API base URL constant
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
 
   // State to manage editable form data
@@ -656,12 +656,13 @@ const ProfilePage: React.FC = () => {
       </div>
 
       {/* Custom Notification Toast */}
-      {/* Use a state variable to control the "show" class for animation */}
-      <div
-        className={`fixed top-16 right-4 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-500 transform ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} ${notification.message ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
-      >
-        {notification.message}
-      </div>
+      {notification.message && (
+        <div
+          className={`fixed top-16 right-4 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-500 transform ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} ${notification.message ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
+        >
+          {notification.message}
+        </div>
+      )}
     </div>
   );
 };

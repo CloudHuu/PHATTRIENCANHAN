@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice';
+import API_BASE_URL from '../config/api';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const LoginPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false); // State for loading status
   const [error, setError] = useState<string | null>(null); // State for overall error message
-  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({}); // State for validation errors
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({}); // State for validation errors
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -21,8 +22,8 @@ const LoginPage: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-     // Clear specific field error when user starts typing
-     if (formErrors[name]) {
+    // Clear specific field error when user starts typing
+    if (formErrors[name]) {
       setFormErrors((prev) => ({
         ...prev,
         [name]: '',
@@ -31,7 +32,7 @@ const LoginPage: React.FC = () => {
   };
 
   const validateForm = () => {
-    const errors: {[key: string]: string} = {};
+    const errors: { [key: string]: string } = {};
     if (!formData.email.trim()) {
       errors.email = 'Email không được để trống.';
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
@@ -58,7 +59,7 @@ const LoginPage: React.FC = () => {
 
     try {
       // TODO: Replace with your actual backend API URL
-      const response = await fetch('http://localhost:3000/auth/login', { // Assuming your backend runs on http://localhost:3000
+        const response = await fetch(`${API_BASE_URL}/auth/login`, { // Assuming your backend runs on http://localhost:3000
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ const LoginPage: React.FC = () => {
 
       if (!response.ok) {
         // Handle API errors
-         // Check if data is an object and has a message property, otherwise use a default error
+        // Check if data is an object and has a message property, otherwise use a default error
         const errorMessage = data && typeof data === 'object' && data.message ? data.message : 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.';
         throw new Error(errorMessage);
       }
@@ -128,7 +129,7 @@ const LoginPage: React.FC = () => {
                 className={`appearance-none rounded-xl relative block w-full px-4 py-3 border ${formErrors.email ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out`}
                 placeholder="Email"
               />
-               {formErrors.email && <p className="mt-1 text-red-500 text-xs">{formErrors.email}</p>}
+              {formErrors.email && <p className="mt-1 text-red-500 text-xs">{formErrors.email}</p>}
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
@@ -144,7 +145,7 @@ const LoginPage: React.FC = () => {
                 className={`appearance-none rounded-xl relative block w-full px-4 py-3 border ${formErrors.password ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:text-sm transition-all duration-300 ease-in-out`}
                 placeholder="Mật khẩu"
               />
-               {formErrors.password && <p className="mt-1 text-red-500 text-xs">{formErrors.password}</p>}
+              {formErrors.password && <p className="mt-1 text-red-500 text-xs">{formErrors.password}</p>}
             </div>
           </div>
 

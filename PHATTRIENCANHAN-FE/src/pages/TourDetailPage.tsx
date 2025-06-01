@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import API_BASE_URL from '../config/api'; // Thêm dòng này
 
 // Define the type for tour detail data based on backend entity
 interface TourDetail {
@@ -24,7 +25,6 @@ const TourDetailPage: React.FC = () => {
   // Get the tour ID from the URL parameters
   const { id } = useParams<{ id: string }>(); // id is string from URL
 
-  const API_BASE_URL = 'http://localhost:3000'; // Your API base URL
 
   const [tour, setTour] = useState<TourDetail | null>(null); // State to hold tour data
   const [loading, setLoading] = useState(true); // State to handle loading status

@@ -1,7 +1,102 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import HeroSlider from '../components/HeroSlider';
+import API_BASE_URL from '../config/api'; // Thêm dòng này
+
 const HomePage: React.FC = () => {
+
+  interface NewsItem {
+    id: number; // Backend returns number
+    title: string;
+    category: string;
+    date: string; // Backend returns Date, might need formatting
+    images: string[]; // Updated: Assuming backend returns an array of image paths
+    description: string;
+    author: string;
+    views: number;
+  }
+
+  interface TourItem {
+    id: number;
+    name: string;
+    description: string;
+    images: string[]; // Updated: Assuming backend returns an array of image paths
+    price: number;
+    duration: string; // Or appropriate type
+    // Add other relevant fields from your backend Tour entity
+  }
+
+  const [featuredNews, setFeaturedNews] = useState<NewsItem[]>([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const [errorNews, setErrorNews] = useState<string | null>(null);
+
+  const [featuredTours, setFeaturedTours] = useState<TourItem[]>([]); // Use updated interface
+  const [loadingTours, setLoadingTours] = useState(true);
+  const [errorTours, setErrorTours] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFeaturedNews = async () => {
+      setLoadingNews(true);
+      setErrorNews(null);
+      try {
+        // Fetch news from backend.
+        const response = await fetch(`${API_BASE_URL}/news`);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const data: NewsItem[] = await response.json();
+        console.log('Fetched featured news data:', data);
+
+        // Take the first 3 news items for the featured section
+        setFeaturedNews(data.slice(0, 3));
+        setLoadingNews(false);
+
+      } catch (err: any) {
+        console.error('Error fetching featured news:', err);
+        setErrorNews('Không thể tải tin tức nổi bật.');
+        setLoadingNews(false);
+      }
+    };
+
+    fetchFeaturedNews();
+  }, []); // Empty dependency array: fetch news once on mount
+
+  // Effect to fetch featured tours when the component mounts
+  useEffect(() => {
+    const fetchFeaturedTours = async () => {
+      setLoadingTours(true);
+      setErrorTours(null);
+      try {
+        // Fetch tours from backend.
+        // Assuming backend /tours endpoint returns { data: [], total: 0 }
+        // Take the first 3 tours from data
+        const response = await fetch(`${API_BASE_URL}/tours`);
+
+         if (!response.ok) {
+           const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json(); // Assuming { data: [], total: 0 }
+        console.log('Fetched featured tours data:', result.data);
+
+        // Take the first 3 tours from the data array
+        setFeaturedTours(result.data.slice(0, 3));
+        setLoadingTours(false);
+
+      } catch (err: any) {
+        console.error('Error fetching featured tours:', err);
+        setErrorTours('Không thể tải tour nổi bật.');
+        setLoadingTours(false);
+      }
+    };
+
+    fetchFeaturedTours();
+  }, []); // Empty dependency array: fetch tours once on mount
+
    return (
     <div>
       {/* Thay phần Hero Section cũ bằng slider 3 ảnh */}
@@ -43,83 +138,39 @@ const HomePage: React.FC = () => {
             Tin Tức Nổi Bật
           </h2>
           <div className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-teal-500 scrollbar-track-gray-200">
-            {/* News Card 1 */}
-            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
-              <img
-                  src="/image/danang.jpg"
-                  alt="Đà Nẵng Tour"
-                  className="w-1/3 object-cover rounded-l-lg"
-              />
-              <div className="p-4 flex-1">
-                <h3 className="text-lg font-semibold mb-2">
-                  <Link
-                      to="/news/1"
-                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
-                  >
-                    Hành Trình Kiến Tạo Miền Trung: Đà Nẵng - Sơn Trà - Hội An
-                  </Link>
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  Khám phá vẻ đẹp miền Trung với hành trình qua Đà Nẵng, Sơn Trà, Hội An, Bà Nà và Cù Lao Chàm.
-                </p>
-                <div className="flex justify-between items-center text-xs text-gray-500">
-                  <span>20/03/2024</span>
-                  <span>100 lượt xem</span>
+            {loadingNews && <div className="text-center py-4">Đang tải tin tức...</div>}
+            {errorNews && <div className="text-center py-4 text-red-600">Lỗi: {errorNews}</div>}
+            {!loadingNews && !errorNews && featuredNews.length === 0 && (
+              <div className="text-center py-4 text-gray-600">Không tìm thấy tin tức nổi bật.</div>
+            )}
+            {!loadingNews && !errorNews && featuredNews.map((news) => (
+                <div key={news.id} className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
+                  <img
+                      // Access the first image in the images array
+                      src={news.images && news.images.length > 0 && news.images[0].startsWith('http') ? news.images[0] : `${API_BASE_URL}${news.images?.[0]}`}
+                      alt={news.title}
+                      className="w-1/3 object-cover rounded-l-lg"
+                  />
+                  <div className="p-4 flex-1">
+                    <h3 className="text-lg font-semibold mb-2">
+                      <Link
+                          to={`/news/${news.id}`}
+                          className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
+                      >
+                        {news.title}
+                      </Link>
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                      {news.description}
+                    </p>
+                    <div className="flex justify-between items-center text-xs text-gray-500">
+                      <span>{news.date}</span> {/* Apply date formatting if needed */}
+                      <span>{news.views} lượt xem</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* News Card 2 */}
-            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
-              <img
-                  src="/image/halong.jpg"
-                  alt="Hạ Long Tour"
-                  className="w-1/3 object-cover rounded-l-lg"
-              />
-              <div className="p-4 flex-1">
-                <h3 className="text-lg font-semibold mb-2">
-                  <Link
-                      to="/news/2"
-                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
-                  >
-                    Khám Phá Vịnh Hạ Long - Di Sản Thiên Nhiên Thế Giới
-                  </Link>
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  Trải nghiệm du thuyền trên Vịnh Hạ Long, khám phá hang động và cảnh quan tuyệt đẹp.
-                </p>
-                <div className="flex justify-between items-center text-xs text-gray-500">
-                  <span>19/03/2024</span>
-                  <span>85 lượt xem</span>
-                </div>
-              </div>
-            </div>
-
-            {/* News Card 3 */}
-            <div className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
-              <img
-                  src="/image/phuquoc.jpg"
-                  alt="Phú Quốc Tour"
-                  className="w-1/3 object-cover rounded-l-lg"
-              />
-              <div className="p-4 flex-1">
-                <h3 className="text-lg font-semibold mb-2">
-                  <Link
-                      to="/news/3"
-                      className="block text-gray-800 hover:text-teal-600 transition-colors duration-300"
-                  >
-                    Thư Giãn Tại Thiên Đường Phú Quốc
-                  </Link>
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  Nghỉ dưỡng tại Phú Quốc với bãi biển xanh mướt và ẩm thực độc đáo.
-                </p>
-                <div className="flex justify-between items-center text-xs text-gray-500">
-                  <span>18/03/2024</span>
-                  <span>120 lượt xem</span>
-                </div>
-              </div>
-            </div>
+            ))}
+            
           </div>
         </div>
       </section>
@@ -129,74 +180,37 @@ const HomePage: React.FC = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-900">Tour du lịch nổi bật</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Tour Card 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-              <img
-                src="https://via.placeholder.com/400x250"
-                alt="Tour"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/1" className="hover:text-primary transition-colors duration-300">
-                    Tour du lịch Đà Nẵng - Hội An
-                  </Link>
-                </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An...
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-primary">2,500,000đ</span>
-                  <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
+            {loadingTours && <div className="text-center py-4">Đang tải tour...</div>}
+            {errorTours && <div className="text-center py-4 text-red-600">Lỗi: {errorTours}</div>}
+            {!loadingTours && !errorTours && featuredTours.length === 0 && (
+              <div className="text-center py-4 text-gray-600">Không tìm thấy tour nổi bật.</div>
+            )}
+            {!loadingTours && !errorTours && featuredTours.map((tour) => (
+                <div key={tour.id} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+                  <img
+                    // Access the first image in the images array
+                    src={tour.images && tour.images.length > 0 && tour.images[0].startsWith('http') ? tour.images[0] : `${API_BASE_URL}${tour.images?.[0]}`}
+                    alt={tour.name} // Assuming tour object has a 'name' field for alt text
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-2">
+                      <Link to={`/tours/${tour.id}`} className="hover:text-primary transition-colors duration-300">
+                        {tour.name} {/* Assuming tour object has a 'name' field */}
+                      </Link>
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-base">
+                      {tour.description} {/* Assuming tour object has a 'description' field */}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      {/* Assuming tour object has 'price' and 'duration' fields */}
+                      <span className="text-xl font-bold text-primary">{tour.price?.toLocaleString('vi-VN')}đ</span> {/* Format price */}
+                      <span className="text-sm text-gray-500">{tour.duration}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Tour Card 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-              <img
-                src="https://via.placeholder.com/400x250"
-                alt="Tour"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/2" className="hover:text-primary transition-colors duration-300">
-                    Tour du lịch Nha Trang
-                  </Link>
-                </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Tận hưởng không khí biển và các hoạt động thú vị...
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-primary">3,200,000đ</span>
-                  <span className="text-sm text-gray-500">4 ngày 3 đêm</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Tour Card 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-              <img
-                src="https://via.placeholder.com/400x250"
-                alt="Tour"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  <Link to="/tours/3" className="hover:text-primary transition-colors duration-300">
-                    Tour du lịch Sapa
-                  </Link>
-                </h3>
-                <p className="text-gray-600 mb-4 text-base">
-                  Khám phá vẻ đẹp núi rừng và văn hóa dân tộc...
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-primary">2,800,000đ</span>
-                  <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
-                </div>
-              </div>
-            </div>
+            ))}
+            
           </div>
         </div>
       </section>

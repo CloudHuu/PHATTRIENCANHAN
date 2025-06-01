@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice';
+import API_BASE_URL from '../config/api'; // Thêm dòng này
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const RegisterPage: React.FC = () => {
 
     try {
       // TODO: Replace with your actual backend API URL
-      const response = await fetch('http://localhost:3000/auth/register', { // Assuming your backend runs on http://localhost:3000
+      const response = await fetch(`${API_BASE_URL}/auth/register`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

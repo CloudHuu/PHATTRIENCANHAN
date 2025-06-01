@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import API_BASE_URL from '../config/api';
 
+// Assuming NewsItem structure matches the selected fields from backend News entity for the list view
 interface NewsItem {
-  id: string;
-  category: string;
-  date: string; // Consider using Date type if date objects are fetched
-  image: string;
+  id: number; // Backend returns number, frontend might use string from URL
   title: string;
+  category: string;
+  date: string; // Backend returns Date, might need formatting in frontend or return string from BE
+  image: string;
   description: string;
   author: string;
   views: number;
 }
 
 interface Category {
-  id: string;
+  id: string; // Corresponds to category string from backend
   name: string;
 }
 
@@ -22,162 +24,82 @@ const NewsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Number of news items per page
 
-  const [allNews, setAllNews] = useState<NewsItem[]>([]); // State to hold news data
+  const [allNews, setAllNews] = useState<NewsItem[]>([]); // State to hold all fetched news data
   const [loading, setLoading] = useState(true); // State to handle loading status
   const [error, setError] = useState<string | null>(null); // State to handle errors
 
+
   const categories: Category[] = [
     { id: 'all', name: 'Tất cả' },
+    // Ensure these IDs match the category values returned by backend
     { id: 'travel', name: 'Du lịch' },
     { id: 'culture', name: 'Văn hóa' },
     { id: 'food', name: 'Ẩm thực' },
     { id: 'events', name: 'Sự kiện' },
   ];
 
+  // Effect to fetch news when the component mounts or selectedCategory changes
   useEffect(() => {
     const fetchNews = async () => {
       setLoading(true);
       setError(null);
       try {
-        // TODO: Replace with actual API call to fetch news
-        // Example: const response = await fetch(`/api/news?category=${selectedCategory}`);
-        // const data: NewsItem[] = await response.json();
+        // Call the backend API to fetch news
+        // Backend findAll currently does not support filtering, so fetch all and filter on frontend.
+        // If backend adds filter support, update this API call.
+        const response = await fetch(`${API_BASE_URL}/news`);
 
-        // Simulate fetching data
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock data structure matching the previous mock, replace with fetched data
-         const mockNewsData: NewsItem[] = [
-            {
-              id: '1',
-              category: 'travel',
-              date: '20/03/2024',
-              image: '/image/danang.jpg',
-              title: 'Khám Phá Vẻ Đẹp Của Đà Nẵng (Fetched)',
-              description: 'Đà Nẵng - thành phố biển với bãi biển Mỹ Khê tuyệt đẹp và cầu Rồng độc đáo.',
-              author: 'Admin',
-              views: 100,
-            },
-            {
-              id: '2',
-              category: 'culture',
-              date: '19/03/2024',
-              image: '/image/hoian.jpg',
-              title: 'Lễ Hội Đèn Lồng Hội An (Fetched)',
-              description: 'Trải nghiệm vẻ đẹp lung linh của phố cổ Hội An trong lễ hội đèn lồng truyền thống.',
-              author: 'Admin',
-              views: 85,
-            },
-             {
-              id: '3',
-              category: 'food',
-              date: '18/03/2024',
-              image: '/image/food.jpg',
-              title: 'Đặc Sản Ẩm Thực Miền Trung (Fetched)',
-              description: 'Thưởng thức các món ăn độc đáo như mì Quảng, bánh tráng cuốn thịt heo.',
-              author: 'Admin',
-              views: 120,
-            },
-              {
-              id: '4',
-              category: 'travel',
-              date: '17/03/2024',
-              image: '/image/phuquoc.jpg', // Assuming you have an image for Phu Quoc
-              title: 'Thiên Đường Biển Đảo Phú Quốc (Fetched)',
-              description: 'Khám phá những bãi biển tuyệt đẹp và trải nghiệm lặn biển ở Phú Quốc.',
-              author: 'Admin',
-              views: 150,
-            },
-            {
-              id: '5',
-              category: 'events',
-              date: '16/03/2024',
-              image: '/image/festival.jpg', // Assuming you have an image for a festival
-              title: 'Festival Hoa Đà Lạt (Fetched)',
-              description: 'Tham gia không khí rực rỡ sắc màu tại Festival Hoa Đà Lạt hàng năm.',
-              author: 'Admin',
-              views: 200,
-            },
-            {
-              id: '6',
-              category: 'culture',
-              date: '15/03/2024',
-              image: '/image/hue.jpg', // Assuming you have an image for Hue
-              title: 'Tìm hiểu Cố Đô Huế (Fetched)',
-              description: 'Du hành về quá khứ với những di tích lịch sử và văn hóa tại Cố Đô Huế.',
-              author: 'Admin',
-              views: 90,
-            },
-             {
-              id: '7',
-              category: 'food',
-              date: '14/03/2024',
-              image: '/image/hanoi-food.jpg', // Assuming you have an image for Hanoi food
-              title: 'Ẩm Thực Đường Phố Hà Nội (Fetched)',
-              description: 'Thưởng thức những món ngon vỉa hè nổi tiếng của Hà Nội.',
-              author: 'Admin',
-              views: 180,
-            },
-            {
-              id: '8',
-              category: 'travel',
-              date: '13/03/2024',
-              image: '/image/sapa.jpg', // Assuming you have an image for Sapa
-              title: 'Chinh Phục Đỉnh Fansipan - Sapa (Fetched)',
-              description: 'Trải nghiệm cáp treo lên đỉnh Fansipan và khám phá vẻ đẹp hùng vĩ của Sapa.',
-              author: 'Admin',
-              views: 250,
-            },
-            {
-              id: '9',
-              category: 'events',
-              date: '12/03/2024',
-              image: '/image/countdown.jpg', // Assuming you have an image for a countdown event
-              title: 'Chào Đón Năm Mới Tại TP.HCM (Fetched)',
-              description: 'Tham gia không khí sôi động của đêm Countdown tại trung tâm TP.HCM.',
-              author: 'Admin',
-              views: 300,
-            },
-            {
-              id: '10',
-              category: 'culture',
-              date: '11/03/2024',
-              image: '/image/nhatrang.jpg', // Assuming you have an image for Nha Trang
-              title: 'Du Lịch Biển Nha Trang (Fetched)',
-              description: 'Tận hưởng nắng vàng, biển xanh tại thành phố biển Nha Trang xinh đẹp.',
-              author: 'Admin',
-              views: 110,
-            },
-          ];
+        if (!response.ok) {
+           const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
 
-        // Apply category filter on fetched data (if API doesn't support it)
-        const filteredData = selectedCategory === 'all' ? mockNewsData : mockNewsData.filter(news => news.category === selectedCategory);
+        const data: NewsItem[] = await response.json();
+        console.log('Fetched news data:', data);
 
-        setAllNews(filteredData); // Set fetched and filtered data
+        // Store all fetched news, filtering will be applied later for display
+        setAllNews(data); 
         setLoading(false);
+
       } catch (err: any) {
-        setError(err.message);
+        console.error('Error fetching news:', err);
+        setError('Không thể tải danh sách tin tức. Vui lòng thử lại sau.');
         setLoading(false);
       }
     };
 
     fetchNews();
-  }, [selectedCategory]); // Rerun effect when selectedCategory changes
+  }, []); // Empty dependency array: fetch all news once on mount
 
-  // Pagination logic
-  const totalPages = Math.ceil(allNews.length / itemsPerPage);
+  // Apply category filter to all fetched news whenever allNews or selectedCategory changes
+  const filteredNews = selectedCategory === 'all' ? allNews : allNews.filter(news => news.category === selectedCategory);
+
+  // Pagination logic applied to filtered news
+  const totalItems = filteredNews.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentNews = allNews.slice(startIndex, endIndex);
+  const currentNews = filteredNews.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+  
+  // Reset page to 1 when category filter changes
+  useEffect(() => {
+      setCurrentPage(1);
+  }, [selectedCategory]);
+
+  // Generate page numbers for pagination controls
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
 
   // Get category name for displaying
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
-    return category ? category.name : categoryId;
+    return category ? category.name : categoryId; // Fallback to ID if name not found
   };
 
   return (
@@ -193,14 +115,14 @@ const NewsPage = () => {
             </p>
           </div>
 
-          {/* Categories */}
+          {/* Categories Filter */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             {categories.map((category) => (
                 <button
                     key={category.id}
                     onClick={() => {
                       setSelectedCategory(category.id);
-                      setCurrentPage(1); // Reset to first page on category change
+                      // setCurrentPage(1); // Already handled by effect above
                     }}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                         selectedCategory === category.id
@@ -215,18 +137,22 @@ const NewsPage = () => {
 
           {/* News Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading && <p>Đang tải tin tức...</p>}
-            {error && <p>Lỗi khi tải tin tức: {error}</p>}
-            {!loading && !error && currentNews.length === 0 && <p>Không tìm thấy tin tức nào.</p>}
+            {loading && <div className="text-center py-12">Đang tải tin tức...</div>}
+            {error && <div className="text-center py-12 text-red-600">Lỗi khi tải tin tức: {error}</div>}
+            {!loading && !error && currentNews.length === 0 && (
+               <div className="text-center py-12 text-gray-600">Không tìm thấy tin tức nào phù hợp với bộ lọc.</div>
+            )}
             {!loading && !error && currentNews.map((news) => (
                 <div key={news.id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-200 hover:shadow-lg hover:-translate-y-1">
                   <img
-                      src={news.image}
+                      // Prepend API_BASE_URL if image path is relative
+                      src={news.image.startsWith('http') ? news.image : `${API_BASE_URL}${news.image}`}
                       alt={news.title}
                       className="w-full h-40 object-cover"
                   />
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
+                {/* Display category name based on ID */}
                 <span className={`px-2 py-1 ${
                   news.category === 'travel' ? 'bg-orange-100 text-orange-800' :
                   news.category === 'culture' ? 'bg-yellow-100 text-yellow-700' :
@@ -235,9 +161,11 @@ const NewsPage = () => {
                 } rounded-full text-xs`}>
                   {getCategoryName(news.category)}
                 </span>
-                      <span className="text-xs text-gray-500">{news.date}</span>
+                      {/* Display formatted date - assuming backend returns string or Date object */}
+                      <span className="text-xs text-gray-500">{news.date}</span> {/* You might need date formatting here */}
                     </div>
                     <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+                      {/* Link to news detail page */}
                       <Link
                           to={`/news/${news.id}`}
                           className="text-gray-800 hover:text-teal-600 transition-colors duration-200"
@@ -248,8 +176,8 @@ const NewsPage = () => {
                     <p className="text-gray-600 text-sm mb-3 line-clamp-3">
                       {news.description}
                     </p>
-                    <div className="flex justify-between items-center text-xs text-gray-500">
-                      <span>Tác giả: {news.author}</span>
+                    <div className="flex items-center text-gray-500 text-sm">
+                      <span className="mr-4">Tác giả: {news.author}</span>
                       <span>{news.views} lượt xem</span>
                     </div>
                   </div>
@@ -258,35 +186,48 @@ const NewsPage = () => {
           </div>
 
           {/* Pagination */}
-           {!loading && !error && allNews.length > 0 && (
-              <div className="flex justify-center mt-10">
-                <nav className="flex items-center gap-2">
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-10">
+              <nav className="flex items-center gap-2">
+                {/* Previous button */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || loading}
+                  className={`px-4 py-2 border rounded-md transition-colors duration-200 ${
+                    currentPage === 1 || loading ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  Trước
+                </button>
+
+                {/* Page numbers */}
+                {pageNumbers.map(number => (
                   <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={`px-3 py-1 border border-gray-300 rounded-md text-gray-700 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-100 transition-colors duration-200'}`}
+                    key={number}
+                    onClick={() => handlePageChange(number)}
+                    disabled={loading}
+                    className={`px-4 py-2 border rounded-md transition-colors duration-200 ${
+                      currentPage === number ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100'
+                    } ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
-                    Trước
+                    {number}
                   </button>
-                  {[...Array(totalPages)].map((_, index) => (
-                      <button
-                          key={index + 1}
-                          onClick={() => handlePageChange(index + 1)}
-                          className={`px-3 py-1 border rounded-md ${currentPage === index + 1 ? 'bg-teal-600 text-white hover:bg-teal-700' : 'border-gray-300 text-gray-700 hover:bg-teal-100'} transition-colors duration-200`}
-                      >
-                        {index + 1}
-                      </button>
-                  ))}
-                  <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className={`px-3 py-1 border border-gray-300 rounded-md text-gray-700 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-100 transition-colors duration-200'}`}
-                  >
-                    Sau
-                  </button>
-                </nav>
-              </div>
-           )}
+                ))}
+
+                {/* Next button */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages || loading}
+                  className={`px-4 py-2 border rounded-md transition-colors duration-200 ${
+                    currentPage === totalPages || loading ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  Sau
+                </button>
+              </nav>
+            </div>
+          )}
+
         </div>
       </div>
   );
