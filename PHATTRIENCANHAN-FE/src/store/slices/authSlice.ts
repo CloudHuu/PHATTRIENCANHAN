@@ -7,6 +7,7 @@ interface User {
   fullName?: string;
   phone?: string | null;
   avatar?: string;
+  image?: string;
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other';
 }
@@ -31,7 +32,7 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; token: string }>
+      action: PayloadAction<{ user: any; token: string }>
     ) => {
       state.user = {
         id: action.payload.user.id,
@@ -39,7 +40,7 @@ const authSlice = createSlice({
         name: action.payload.user.name,
         fullName: action.payload.user.fullName,
         phone: action.payload.user.phone,
-        avatar: action.payload.user.avatar,
+        avatar: action.payload.user.image,
         dateOfBirth: action.payload.user.dateOfBirth,
         gender: action.payload.user.gender,
       };
@@ -57,6 +58,9 @@ const authSlice = createSlice({
     updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
+        if (action.payload.image !== undefined) {
+          state.user.avatar = action.payload.image;
+        }
       }
     },
   },

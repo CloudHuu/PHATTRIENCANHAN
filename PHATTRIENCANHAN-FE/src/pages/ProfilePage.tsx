@@ -12,6 +12,7 @@ interface EditableProfileData {
   phone?: string;
   avatarPreviewUrl?: string; // To store the URL for preview
   avatarFile?: File; // To store the selected file
+  avatarUrl?: string; // To store the URL returned from upload API
 }
 
 // Define the type for the data sent to the update profile API
@@ -20,8 +21,7 @@ interface UpdateProfileDto {
     dateOfBirth?: string;
     fullName?: string;
     phone?: string;
-    // Assuming backend accepts base64 string for image
-    image?: string; // Base64 string of the image
+    image?: string; // URL of the uploaded image
 }
 
 const ProfilePage: React.FC = () => {
@@ -30,7 +30,13 @@ const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'wishlist' | 'wallet'>('profile');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingUser, setIsFetchingUser] = useState(true); // State to track initial user fetch
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false); // State to track avatar upload status
+  const [notification, setNotification] = useState<{ message: string | null; type: 'success' | 'error' | null }>({
+    message: null,
+    type: null,
+  }); // State for custom notification
 
+  const API_BASE_URL = 'http://localhost:3000'; // Add API base URL constant
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
 
   // State to manage editable form data
@@ -41,6 +47,7 @@ const ProfilePage: React.FC = () => {
     phone: user?.phone || '',
     avatarPreviewUrl: user?.avatar || '', // Use existing avatar for initial preview
     avatarFile: undefined,
+    avatarUrl: user?.avatar || '', // Initialize with existing avatar URL
   });
 
   // Effect to fetch user data when component mounts or token changes
@@ -55,7 +62,6 @@ const ProfilePage: React.FC = () => {
 
       setIsFetchingUser(true);
       try {
-        const API_BASE_URL = 'http://localhost:3000';
         const response = await fetch(`${API_BASE_URL}/auth/me`, { // Assume /auth/me endpoint
           method: 'GET',
           headers: {
@@ -96,15 +102,20 @@ const ProfilePage: React.FC = () => {
   // Update editableData when user data changes (triggered after fetch or update API call)
   useEffect(() => {
     console.log('User data updated in Redux, updating editableData:', user);
-    setEditableData({
+    // When user data is first fetched or updated, initialize/update editableData
+    // Prioritize user.avatar from Redux for initial load/updates, but fallback to uploaded URL if available
+    setEditableData(prevData => ({
+      ...prevData, // Keep existing local state for other fields
       fullName: user?.fullName || '',
       dateOfBirth: user?.dateOfBirth || '',
       gender: user?.gender || undefined,
       phone: user?.phone || '',
-      avatarPreviewUrl: user?.avatar || '', // Update preview URL from new user data
-      // Keep avatarFile as undefined unless a new one is selected after this effect runs
+      // Use user.avatar from Redux if available, otherwise use the uploaded URL from prevData,
+      // which is set after a successful upload/save.
+      avatarPreviewUrl: user?.avatar || prevData.avatarUrl || '', 
+      avatarUrl: user?.avatar || prevData.avatarUrl || '', // Keep the latest known avatar URL
       avatarFile: undefined,
-    });
+    }));
   }, [user]); // Depend on user
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -120,28 +131,73 @@ const ProfilePage: React.FC = () => {
       fileInputRef.current?.click(); // Click the hidden file input
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
           if (file.size > 1024 * 1024) { // Check file size (1MB)
-              alert('Kích thước ảnh không được vượt quá 1MB.');
-              // Clear the selected file
-              if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-              }
               setEditableData(prevData => ({ ...prevData, avatarFile: undefined, avatarPreviewUrl: user?.avatar || '' })); // Revert preview to original
+              // alert('Kích thước ảnh không được vượt quá 1MB.');
+              setNotification({
+                message: 'Kích thước ảnh không được vượt quá 1MB.',
+                type: 'error',
+              });
               return;
           }
 
+          // Create preview URL for immediate display
           const reader = new FileReader();
           reader.onloadend = () => {
               setEditableData(prevData => ({
                   ...prevData,
                   avatarFile: file,
-                  avatarPreviewUrl: reader.result as string, // Store Base64 or Data URL for preview
+                  avatarPreviewUrl: reader.result as string, // Store Data URL for preview
               }));
           };
-          reader.readAsDataURL(file); // Read file as Data URL (Base64)
+          reader.readAsDataURL(file);
+
+          // Upload file to server
+          try {
+              setIsUploadingAvatar(true);
+              const formData = new FormData();
+              formData.append('avatar', file); // Change 'file' to 'avatar' to match backend expectation
+
+              const response = await fetch(`${API_BASE_URL}/auth/upload-avatar`, {
+                  method: 'POST',
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                  },
+                  body: formData,
+              });
+
+              if (!response.ok) {
+                  const errorData = await response.json().catch(() => null);
+                  throw new Error(errorData?.message || 'Upload failed');
+              }
+
+              const data = await response.json();
+              console.log('Upload response:', data);
+
+              // Update state with the returned avatar URL
+              setEditableData(prevData => ({
+                  ...prevData,
+                  avatarUrl: data.avatarUrl,
+              }));
+
+          } catch (error) {
+              console.error('Error uploading avatar:', error);
+              setNotification({
+                message: error instanceof Error ? error.message : 'Không thể tải ảnh lên. Vui lòng thử lại.',
+                type: 'error',
+              });
+              // Revert preview to original
+              setEditableData(prevData => ({
+                  ...prevData,
+                  avatarFile: undefined,
+                  avatarPreviewUrl: user?.avatar || '',
+              }));
+          } finally {
+              setIsUploadingAvatar(false);
+          }
       }
   };
 
@@ -152,13 +208,17 @@ const ProfilePage: React.FC = () => {
     }
 
     setIsLoading(true);
+
+    // Get the avatar URL that was successfully uploaded, if any
+    const uploadedAvatarUrl = editableData.avatarUrl;
+
     const updateData: UpdateProfileDto = {
       gender: editableData.gender,
       dateOfBirth: editableData.dateOfBirth,
       fullName: editableData.fullName,
       phone: editableData.phone,
-      // Include image data if a new file was selected
-      image: editableData.avatarFile ? editableData.avatarPreviewUrl : undefined, // Send Base64 if file exists
+      // Send the uploaded avatar URL to backend
+      image: uploadedAvatarUrl, // This is the URL uploaded previously
     };
 
     // Debug logs
@@ -169,7 +229,7 @@ const ProfilePage: React.FC = () => {
     try {
       const API_BASE_URL = 'http://localhost:3000';
       console.log('Making API call to:', `${API_BASE_URL}/auth/update`);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/update`, {
         method: 'PATCH',
         headers: {
@@ -186,32 +246,67 @@ const ProfilePage: React.FC = () => {
         const errorText = await response.text();
         console.error('Error response:', errorText);
         let errorMessage = 'Cập nhật thông tin thất bại';
-        
+
         try {
           const errorJson = JSON.parse(errorText);
           errorMessage = errorJson.message || errorMessage;
         } catch (e) {
           errorMessage = errorText || errorMessage;
         }
-        
+
         throw new Error(errorMessage);
       }
 
       const updatedUserData = await response.json();
       console.log('Updated user data from server:', updatedUserData);
-      
-      // Update Redux store with new user data using the specific action
-      // This will trigger the second useEffect to update editableData
-      dispatch(updateUserProfile(updatedUserData));
-      
-      alert('Thông tin đã được cập nhật thành công!');
+
+      // Update Redux store with new user data
+      // Explicitly use the uploadedAvatarUrl for the avatar field
+      dispatch(updateUserProfile({
+        ...user, // Start with current user data from Redux
+        ...updatedUserData, // Override with data from update response for other fields
+        avatar: uploadedAvatarUrl || updatedUserData.avatar || user?.avatar, // Prioritize uploaded URL
+      }));
+
+      // Update local state to reflect changes immediately
+      setEditableData(prevData => ({
+        ...prevData,
+        // Update specific fields from response, fallback to prevData if response is empty
+        fullName: updatedUserData.fullName || prevData.fullName || '',
+        dateOfBirth: updatedUserData.dateOfBirth || prevData.dateOfBirth || '',
+        gender: updatedUserData.gender || prevData.gender || undefined,
+        phone: updatedUserData.phone || prevData.phone || '',
+        // Ensure local avatar state is updated with the uploaded URL and clear uploaded file
+        avatarPreviewUrl: uploadedAvatarUrl || '', // Use the uploaded URL for preview
+        avatarFile: undefined, // Clear the uploaded file
+        avatarUrl: uploadedAvatarUrl || '', // Keep the uploaded URL
+      }));
+
+      setNotification({
+        message: 'Lưu Thành Công',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi cập nhật thông tin.');
+      // alert(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi cập nhật thông tin.');
+      setNotification({
+        message: error instanceof Error ? error.message : 'Đã xảy ra lỗi khi cập nhật thông tin.',
+        type: 'error',
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Effect to auto-hide notification
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ message: null, type: null });
+      }, 5000); // Hide after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [notification.message]);
 
   // Show loading state while fetching initial user data
   if (isFetchingUser) {
@@ -227,16 +322,24 @@ const ProfilePage: React.FC = () => {
     <div className="py-12">
       <div className="container mx-auto px-4">
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Layout: Grid with 4 columns on large screens */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4 lg:gap-8 lg:items-stretch">
+
           {/* Sidebar - Left Side */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              {/* User Info Section - Matching Image */}
-              <div className="flex flex-col items-center pb-6 border-b border-gray-200 mb-6">
+          {/* Flex column to make content fill height */}
+          <div className="lg:col-span-1 flex flex-col">
+            {/* Sidebar content box - flex-grow to fill column height */}
+            <div className="bg-white rounded-lg shadow-lg p-6 flex-grow">
+              {/* User Info Section */}
+              <div className="flex flex-col items-center pb-4 border-b border-gray-200 mb-6"> {/* Reduced bottom padding here */}
                 {/* Avatar with Yellow Border */}
                 <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-5xl font-bold mb-4 border-4 border-yellow-400 overflow-hidden">
                   {editableData.avatarPreviewUrl ? (
-                      <img src={editableData.avatarPreviewUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
+                      <img 
+                          src={editableData.avatarPreviewUrl.startsWith('data:') ? editableData.avatarPreviewUrl : `${API_BASE_URL}${editableData.avatarPreviewUrl}`} 
+                          alt="Avatar Preview" 
+                          className="w-full h-full object-cover" 
+                      />
                   ) : (
                       <div className="w-full h-full bg-gray-300 flex items-center justify-center text-white text-5xl font-bold">
                           {user?.fullName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'H'}
@@ -312,7 +415,8 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Main Content - Right Side */}
-          <div className="lg:col-span-3">
+          {/* Flex column to make content fill height */}
+          <div className="lg:col-span-3 flex flex-col">
             {/* Tab Navigation */}
             <div className="border-b border-gray-200 mb-2">
                 <nav className="-mb-px flex space-x-8">
@@ -344,82 +448,130 @@ const ProfilePage: React.FC = () => {
             </div>
 
             {/* Tab Content - Thông tin cá nhân */}
-            {activeTab === 'profile' && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className={`bg-white rounded-lg shadow-lg p-6 flex-grow ${activeTab !== 'profile' ? 'hidden' : ''}`}>
 
-                <div className="flex justify-between items-start"> {/* Ensure items are aligned to the top */}
-                    {/* Use flex-grow on the inner div to distribute space */}
-                    <div className="flex space-x-8 w-full"> {/* Increased space-x and ensure full width usage */}
-                         {/* Tên người dùng and Ngày sinh */}
-                         <div className="flex flex-col flex-1"> {/* Use flex-1 to allow column to grow */}
-                             <label className="block text-sm font-medium text-gray-700 mb-1">* Tên người dùng</label>
-                             <input type="text" value={user?.email?.split('@')[0] || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+              {/* Inner form layout: Two columns */}
+              <div className="flex flex-wrap -mx-4">
 
-                             {/* Ngày sinh */}
-                             <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">* Ngày sinh</label>
-                             <div className="relative">
-                                 <input
-                                     type="text"
-                                     placeholder="Chọn ngày sinh"
-                                     className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-primary focus:border-primary"
-                                     name="dateOfBirth"
-                                     value={editableData.dateOfBirth}
-                                     onChange={handleInputChange}
-                                 />
-                                  {/* Calendar Icon */}
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                             </div>
-                         </div>
+                  {/* Left Column */}
+                  <div className="w-full lg:w-1/2 px-4">
+                      <div className="flex flex-col space-y-4">
 
-                          {/* Họ và tên and Giới tính */} 
-                          <div className="flex flex-col flex-1 space-y-4"> {/* Group right fields and avatar, allow column to grow */}
-                             {/* Họ và tên */}
-                             <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                             <input
-                                 type="text"
-                                 value={editableData.fullName}
-                                 className="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"
-                                 name="fullName"
-                                 onChange={handleInputChange}
-                             />
+                          {/* Tên người dùng */}
+                          <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">* Tên người dùng</label>
+                              <input type="text" value={user?.email?.split('@')[0] || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                          </div>
 
-                             {/* Giới tính */}
-                             <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">Giới tính</label>
-                             <div className="flex items-center space-x-4 pt-2"> 
-                                  <label className="inline-flex items-center">
-                                     <input
-                                         type="radio"
-                                         name="gender"
-                                         value="male"
-                                         className="form-radio text-primary"
-                                         checked={editableData.gender === 'male'}
-                                         onChange={() => handleGenderChange('male')}
-                                     />
-                                     <span className="ml-2 text-gray-700">Nam</span>
-                                 </label>
-                                  <label className="inline-flex items-center">
-                                     <input
-                                         type="radio"
-                                         name="gender"
-                                         value="female"
-                                         className="form-radio text-primary"
-                                         checked={editableData.gender === 'female'}
-                                         onChange={() => handleGenderChange('female')}
-                                     />
-                                     <span className="ml-2 text-gray-700">Nữ</span>
-                                 </label>
-                             </div>
+                          {/* Tài khoản Email */}
+                          <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">* Tài khoản Email</label>
+                              <input type="email" value={user?.email || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                              <p className="mt-1 text-sm text-green-600">Email đã được xác thực</p>
+                          </div>
 
-                             {/* Avatar Upload Area - Placed below Gender */}
+                          {/* Số điện thoại */}
+                          <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                              <div className="flex space-x-2">
+                                  <input
+                                      type="tel"
+                                      value={editableData.phone}
+                                      placeholder="Nhập số điện thoại"
+                                      className="flex-grow px-2 py-2 border rounded-lg focus:ring-primary focus:border-primary"
+                                      name="phone"
+                                      onChange={handleInputChange}
+                                  />
+                                  {/* Verification button */}
+                                  <button className="flex items-center px-3 py-1 text-xs font-semibold bg-red-200 text-red-700 rounded-full shadow hover:bg-red-300 transition-colors duration-300 whitespace-nowrap">
+                                      {/* Icon */}
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+                                      </svg>
+                                      <span>Xác Thực Ngay!</span>
+                                  </button>
+                              </div>
+                          </div>
+
+                           {/* Ngày sinh */}
+                           <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-1">* Ngày sinh</label>
+                               <div className="relative">
+                                   <input
+                                       type="text"
+                                       placeholder="Chọn ngày sinh"
+                                       className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-primary focus:border-primary"
+                                       name="dateOfBirth"
+                                       value={editableData.dateOfBirth}
+                                       onChange={handleInputChange}
+                                   />
+                                    {/* Calendar Icon */}
+                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                               </div>
+                           </div>
+
+                      </div>
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="w-full lg:w-1/2 px-4 mt-4 lg:mt-0"> {/* Add top margin for small screens, remove on large */}
+                      <div className="flex flex-col space-y-4">
+                          {/* Họ và tên */}
+                          <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                               <input
+                                   type="text"
+                                   value={editableData.fullName}
+                                   className="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"
+                                   name="fullName"
+                                   onChange={handleInputChange}
+                               />
+                          </div>
+
+                           {/* Giới tính - Aligned with Username in left column conceptually */}
+                           <div className="mt-4 lg:mt-0"> {/* Adjust top margin to align with Username row */}
+                               <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                               <div className="flex items-center space-x-4 pt-2"> 
+                                    <label className="inline-flex items-center">
+                                       <input
+                                           type="radio"
+                                           name="gender"
+                                           value="male"
+                                           className="form-radio text-primary"
+                                           checked={editableData.gender === 'male'}
+                                           onChange={() => handleGenderChange('male')}
+                                       />
+                                       <span className="ml-2 text-gray-700">Nam</span>
+                                   </label>
+                                    <label className="inline-flex items-center">
+                                       <input
+                                           type="radio"
+                                           name="gender"
+                                           value="female"
+                                           className="form-radio text-primary"
+                                           checked={editableData.gender === 'female'}
+                                           onChange={() => handleGenderChange('female')}
+                                       />
+                                       <span className="ml-2 text-gray-700">Nữ</span>
+                                   </label>
+                               </div>
+                            </div>
+
+                            {/* Avatar Upload Area - Below Gender */}
                              <div className="flex flex-col items-center space-y-2 mt-6"> {/* Adjusted spacing and added top margin */}
                                  {/* Circular Upload Area */}
                                   {/* Clickable div to trigger file input */}
                                   <div
-                                      className="flex-shrink-0 w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer overflow-hidden"
+                                      className="flex-shrink-0 w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer overflow-hidden relative"
                                       onClick={handleAvatarClick}
                                   >
+                                      {isUploadingAvatar ? (
+                                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                                          </div>
+                                      ) : null}
                                       {editableData.avatarPreviewUrl ? (
                                           <img src={editableData.avatarPreviewUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
                                       ) : (
@@ -441,72 +593,40 @@ const ProfilePage: React.FC = () => {
                                       accept="image/png, image/jpeg"
                                       onChange={handleFileChange}
                                       className="hidden"
+                                      disabled={isUploadingAvatar}
                                   />
 
                                  {/* File type info */}
-                                 <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 1MB</p>
+                                 <p className="mt-1 text-xs text-gray-500">
+                                     {isUploadingAvatar ? 'Đang tải ảnh lên...' : 'PNG, JPG up to 1MB'}
+                                 </p>
                              </div>
 
-                         </div>
-                    </div>
-                </div>
+                             {/* Save Changes button - Below Avatar Upload */}
+                             <div className="flex justify-end mt-4 w-full"> {/* Ensure full width for alignment */} 
+                               <button
+                                   onClick={handleSaveProfile}
+                                   disabled={isLoading}
+                                   className={`px-6 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition-colors duration-300 ${
+                                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                                   }`}
+                               >
+                                   {isLoading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
+                               </button>
+                             </div>
 
-                {/* Email and Phone sections */}
-                <div className="space-y-6 mt-6"> {/* Adjusted top margin and vertical space */}
-                    {/* Email */}
-                    <div className="w-1/3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">* Tài khoản Email</label>
-                         <input type="email" value={user?.email || ''} readOnly className="w-full px-4 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
-                         {/* Verified label */}
-                         <p className="mt-1 text-sm text-green-600">Email đã được xác thực</p>
-                    </div>
-
-                    {/* Phone Number and Save Button Row */}
-                     <div className="flex items-end space-x-4">
-                        <div className="w-1/3">
-                           <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                           <div className="flex space-x-2">
-                              <input
-                                  type="tel"
-                                  value={editableData.phone}
-                                  placeholder="Nhập số điện thoại"
-                                  className="flex-grow px-2 py-2 border rounded-lg focus:ring-primary focus:border-primary"
-                                  name="phone"
-                                  onChange={handleInputChange}
-                              />
-                              {/* Verification button */}
-                              <button className="flex items-center px-3 py-1 text-xs font-semibold bg-red-200 text-red-700 rounded-full shadow hover:bg-red-300 transition-colors duration-300 whitespace-nowrap">
-                                {/* Icon */}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-                                </svg>
-                                <span>Xác Thực Ngay!</span>
-                              </button>
-                           </div>
                         </div>
                     </div>
 
                 </div>
 
-                {/* Save Changes button */}
-                <div className="flex justify-end mt-4">
-                  <button
-                      onClick={handleSaveProfile}
-                      disabled={isLoading}
-                      className={`px-6 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600 transition-colors duration-300 ${
-                        isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                  >
-                      {isLoading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
-                  </button>
-                </div>
 
               </div>
-            )}
+           
 
             {/* Tab Content - Lịch sử đặt tour */}
             {activeTab === 'bookings' && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="bg-white rounded-lg shadow-lg p-6 flex-grow">
                 <h2 className="text-xl font-semibold mb-6 text-gray-800">Lịch sử đặt tour</h2>
                 <div className="text-center text-gray-500 py-8">
                   Chưa có tour nào được đặt
@@ -533,6 +653,14 @@ const ProfilePage: React.FC = () => {
 
           </div>
         </div>
+      </div>
+
+      {/* Custom Notification Toast */}
+      {/* Use a state variable to control the "show" class for animation */}
+      <div
+        className={`fixed top-16 right-4 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-500 transform ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} ${notification.message ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
+      >
+        {notification.message}
       </div>
     </div>
   );

@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const ToursPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
   const [duration, setDuration] = useState<string>('all');
+  const [tours, setTours] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [toursPerPage, setToursPerPage] = useState<number>(6); // Match backend default limit
+  const [totalTours, setTotalTours] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+
+  const API_BASE_URL = 'http://localhost:3000';
 
   const categories = [
     { id: 'all', name: 'Tất cả' },
@@ -20,6 +31,74 @@ const ToursPage: React.FC = () => {
     { id: '4-7', name: '4-7 ngày' },
     { id: '8+', name: '8+ ngày' },
   ];
+
+  // Effect to fetch tours when the component mounts or currentPage changes
+  useEffect(() => {
+    const fetchTours = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Call the backend API with pagination parameters
+        const response = await fetch(`${API_BASE_URL}/tours?page=${currentPage}&limit=${toursPerPage}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        // Assuming the backend returns { data: Tour[], total: number }
+        setTours(data.data); // Update tours state with the data for the current page
+        setTotalTours(data.total); // Set the total number of tours
+        setLoading(false);
+        
+      } catch (error) {
+        console.error('Error fetching tours:', error);
+        setError('Không thể tải danh sách tour. Vui lòng thử lại sau.');
+        setLoading(false);
+      }
+    };
+
+    fetchTours(); // Execute the fetch function
+    
+  }, [currentPage, toursPerPage]); // Rerun effect when currentPage or toursPerPage changes
+
+  // Effect to calculate total pages when totalTours or toursPerPage changes
+  useEffect(() => {
+    if (totalTours > 0 && toursPerPage > 0) {
+      setTotalPages(Math.ceil(totalTours / toursPerPage));
+    } else {
+      setTotalPages(0);
+    }
+  }, [totalTours, toursPerPage]);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  // Generate page numbers for pagination controls
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  if (loading) {
+    return <div className="text-center py-12">Đang tải danh sách tour...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-600">Lỗi: {error}</div>;
+  }
+
+  const filteredTours = tours;
+
+  if (filteredTours.length === 0) {
+    return <div className="text-center py-12 text-gray-600">Không tìm thấy tour nào phù hợp.</div>;
+  }
 
   return (
     <div className="py-12">
@@ -97,135 +176,77 @@ const ToursPage: React.FC = () => {
           {/* Tours Grid */}
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Tour Card 1 */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-                <img
-                  src="https://via.placeholder.com/400x250"
-                  alt="Tour"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                      Tour trong nước
-                    </span>
-                    <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/1" className="hover:text-primary transition-colors duration-300">
-                      Tour du lịch Đà Nẵng - Hội An
-                    </Link>
-                  </h3>
-                  <p className="text-gray-600 mb-4 text-base">
-                    Khám phá vẻ đẹp của Đà Nẵng và phố cổ Hội An...
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-primary">
-                      2,500,000đ
-                    </span>
-                    <Link
-                      to="/tours/1"
-                      className="btn btn-primary transition-colors duration-300"
-                    >
-                      Chi tiết
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tour Card 2 */}
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-                <img
-                  src="https://via.placeholder.com/400x250"
-                  alt="Tour"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm">
-                      Tour quốc tế
-                    </span>
-                    <span className="text-sm text-gray-500">4 ngày 3 đêm</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/2" className="hover:text-primary transition-colors duration-300">
-                      Tour du lịch Thái Lan
-                    </Link>
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Khám phá văn hóa và ẩm thực Thái Lan...
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-primary">
-                      5,800,000đ
-                    </span>
-                    <Link
-                      to="/tours/2"
-                      className="btn btn-primary transition-colors duration-300"
-                    >
-                      Chi tiết
-                    </Link>
+              {tours.map(tour => (
+                <div key={tour.id} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+                  <img
+                    src={tour.images && tour.images.length > 0 ? `${API_BASE_URL}${tour.images[0]}` : "https://via.placeholder.com/400x250"}
+                    alt={tour.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                        {tour.location}
+                      </span>
+                      <span className="text-sm text-gray-500">{tour.duration} ngày</span>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      <Link to={`/tours/${tour.id}`} className="hover:text-primary transition-colors duration-300">
+                        {tour.name}
+                      </Link>
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-base line-clamp-3">
+                      {tour.description}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold text-primary">
+                        {tour.price.toLocaleString()}đ
+                      </span>
+                      <Link
+                        to={`/tours/${tour.id}`}
+                        className="btn btn-primary transition-colors duration-300"
+                      >
+                        Chi tiết
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Tour Card 3 */}
-              <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
-                <img
-                  src="https://via.placeholder.com/400x250"
-                  alt="Tour"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
-                      Tour biển
-                    </span>
-                    <span className="text-sm text-gray-500">3 ngày 2 đêm</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    <Link to="/tours/3" className="hover:text-primary transition-colors duration-300">
-                      Tour du lịch Nha Trang
-                    </Link>
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Tận hưởng không khí biển và các hoạt động thú vị...
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-primary">
-                      3,200,000đ
-                    </span>
-                    <Link
-                      to="/tours/3"
-                      className="btn btn-primary transition-colors duration-300"
-                    >
-                      Chi tiết
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center mt-12">
-              <nav className="flex items-center gap-2">
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
-                  Trước
-                </button>
-                <button className="px-4 py-2 border rounded-md bg-primary text-white shadow-md transition-colors duration-300 hover:bg-primary/90">
-                  1
-                </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
-                  2
-                </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
-                  3
-                </button>
-                <button className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors duration-300">
-                  Sau
-                </button>
-              </nav>
-            </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-12">
+                <nav className="flex items-center gap-2">
+                  <button 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1 || loading}
+                    className={`px-4 py-2 border rounded-md transition-colors duration-300 ${currentPage === 1 || loading ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50'}`}
+                  >
+                    Trước
+                  </button>
+                  
+                  {pageNumbers.map(number => (
+                    <button
+                      key={number}
+                      onClick={() => handlePageChange(number)}
+                      disabled={loading}
+                      className={`px-4 py-2 border rounded-md transition-colors duration-300 ${currentPage === number ? 'bg-primary text-white shadow-md hover:bg-primary/90' : 'hover:bg-gray-50'} ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                    >
+                      {number}
+                    </button>
+                  ))}
+                  
+                  <button 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages || loading}
+                    className={`px-4 py-2 border rounded-md transition-colors duration-300 ${currentPage === totalPages || loading ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50'}`}
+                  >
+                    Sau
+                  </button>
+                </nav>
+              </div>
+            )}
           </div>
         </div>
       </div>
