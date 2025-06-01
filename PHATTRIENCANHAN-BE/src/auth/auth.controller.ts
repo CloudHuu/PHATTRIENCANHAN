@@ -75,9 +75,15 @@ export class AuthController {
       throw new NotFoundException('User not found');
     }
 
-    // Exclude sensitive data like password before returning
-    const { password, ...result } = user;
-    return result; // Return the full user profile (excluding password)
+    // Ensure the image field is explicitly included in the result
+    const { password, ...result } = user; // Exclude sensitive data like password
+    
+    // Explicitly add the image field if it exists on the user object
+    // Although ...result should include it, being explicit can help debug
+    // if there's an unexpected issue with object spreading or entity mapping.
+    const responseBody = { ...result, image: user.image };
+    console.log('GET /auth/me response body:', responseBody); // Add this log
+    return responseBody; // Return the full user profile (excluding password) and ensure image is included
   }
 
   // Endpoint for authenticated users to upload their avatar (Moved from UsersController)

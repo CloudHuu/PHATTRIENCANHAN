@@ -6,7 +6,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { NewsModule } from './news/news.module';
-import { TourModule } from './tour/tour.module';
+import { ToursModule } from './tours/tours.module';
+
 
 @Module({
   imports: [
@@ -23,7 +24,9 @@ import { TourModule } from './tour/tour.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
+        migrationsRun: true,
+        synchronize: false,
         options: {
           trustServerCertificate: true,
         },
@@ -33,7 +36,9 @@ import { TourModule } from './tour/tour.module';
     AuthModule,
     UsersModule,
     NewsModule,
-    TourModule,
+    ToursModule,
+    
+
   ],
   controllers: [AppController],
   providers: [AppService],

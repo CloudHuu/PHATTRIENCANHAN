@@ -53,7 +53,14 @@ export class UsersService {
 
   // New method to find user by ID
   async findOneById(userId: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id: userId });
+    return this.usersRepository.findOne({
+      where: { id: userId },
+      select: [
+        'id', 'email', 'fullName', 'phone', 'gender', 'dateOfBirth', 'image', // Explicitly select essential fields including image
+        'resetPasswordToken', 'resetPasswordExpires', // Include password reset fields
+        // Add other fields here if necessary
+      ],
+    });
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
