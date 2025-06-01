@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { News } from './news.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @Post()
-  create(@Body() createNewsDto: CreateNewsDto) {
-    return this.newsService.create(createNewsDto);
-  }
-
   @Get()
-  findAll() {
+  findAll(): Promise<News[]> {
     return this.newsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<News> {
+    return this.newsService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post()
+  create(@Body() newsData: Partial<News>): Promise<News> {
+    return this.newsService.create(newsData);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
-    return this.newsService.update(+id, updateNewsDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() newsData: Partial<News>): Promise<News> {
+    return this.newsService.update(id, newsData);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.newsService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.newsService.remove(id);
   }
 }

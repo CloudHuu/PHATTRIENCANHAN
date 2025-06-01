@@ -17,7 +17,7 @@ export class Tour {
   @Column('int')
   duration: number; // in days
 
-  @Column('simple-array')
+  @Column({ type: 'text', transformer: { from: (value) => value ? JSON.parse(value) : [], to: (value) => value ? JSON.stringify(value) : '[]' } })
   images: string[];
 
   @Column({ type: 'nvarchar', length: 255 })
@@ -26,13 +26,13 @@ export class Tour {
   @Column('nvarchar', { length: 255, nullable: true })
   title: string;
 
-  @Column('simple-array', { nullable: true })
+  @Column({ type: 'text', nullable: true, transformer: { from: (value) => value ? JSON.parse(value) : [], to: (value) => value ? JSON.stringify(value) : '[]' } })
   highlights: string[];
 
-  @Column('simple-array', { nullable: true })
+  @Column({ type: 'text', nullable: true, transformer: { from: (value) => value ? JSON.parse(value) : [], to: (value) => value ? JSON.stringify(value) : '[]' } })
   included: string[];
 
-  @Column('simple-array', { nullable: true })
+  @Column({ type: 'text', nullable: true, transformer: { from: (value) => value ? JSON.parse(value) : [], to: (value) => value ? JSON.stringify(value) : '[]' } })
   excluded: string[];
 
   @Column({ default: true })
