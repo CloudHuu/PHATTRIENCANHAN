@@ -1,41 +1,39 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('news')
 export class News {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 255 })
   title: string;
 
-  @Column('text')
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  category: string;
+
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  author: string;
+
+  @Column({ type: 'text', nullable: true })
   content: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
   mainImage: string; // Ảnh chính
 
-  @Column('simple-array', { nullable: true })
-  images: string[]; // Ảnh phụ (nếu có)
+  @Column({ type: 'text', nullable: true })
+  images: string; // Chuỗi, FE sẽ split(',')
 
-  @Column()
-  category: string; // Ví dụ: 'travel' | 'culture' | 'food' | 'events'
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  description: string;
 
-  @Column()
-  author: string; // Có thể là ID của User
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  tags: string; // Chuỗi, FE sẽ split(',')
 
-  @Column()
-  date: Date;
-
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 0 })
   views: number;
 
-  @Column('text')
-  description: string; // Tóm tắt ngắn
-
-  @Column('simple-array', { nullable: true })
-  tags: string[]; // Các tag liên quan
-
-  // Quan hệ Related News sẽ được quản lý bởi entity RelatedNews
+  @Column({ type: 'datetime', nullable: true })
+  date: Date;
 
   @CreateDateColumn()
   createdAt: Date;

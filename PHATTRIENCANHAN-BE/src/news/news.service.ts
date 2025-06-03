@@ -13,11 +13,25 @@ export class NewsService {
     private newsRepository: Repository<News>,
   ) {}
 
-  async findAll(): Promise<News[]> {
-    return this.newsRepository.find({
+  async findAll(): Promise<any[]> {
+    const newsList = await this.newsRepository.find({
       where: { isActive: true },
       order: { date: 'DESC', createdAt: 'DESC' },
-      select: ['id', 'title', 'category', 'date', 'author', 'views', 'image', 'description'], // Select fields needed for list page
+      select: [
+        'id', 'title', 'category', 'date', 'author', 'views', 'mainImage', 'description', 'images', 'tags', 'content', 'isActive', 'createdAt', 'updatedAt'
+      ],
+    });
+    return newsList.map(news => {
+      let imagesArr: string[] = [];
+      if (news.images && news.images.trim() !== '') {
+        imagesArr = news.images.split(',');
+      } else if (news.mainImage) {
+        imagesArr = [news.mainImage];
+      }
+      return {
+        ...news,
+        images: imagesArr,
+      };
     });
   }
 
@@ -57,15 +71,19 @@ export class NewsService {
 
   // Logic để tìm tin tức liên quan (có thể cần tùy chỉnh)
   async findRelatedNews(currentNewsId: number, category: string, limit = 3): Promise<News[]> {
-    return this.newsRepository.find({
+    const related = await this.newsRepository.find({
       where: { 
         isActive: true, 
         category, 
-        id: Not(currentNewsId) // Exclude current news item
+        id: Not(currentNewsId)
       },
       order: { date: 'DESC', createdAt: 'DESC' },
       take: limit,
-      select: ['id', 'title', 'image', 'date'], // Fields needed for related news list
+      select: ['id', 'title', 'mainImage', 'date'],
     });
+    return related.map(news => ({
+      ...news,
+      image: news.mainImage,
+    }));
   }
 }

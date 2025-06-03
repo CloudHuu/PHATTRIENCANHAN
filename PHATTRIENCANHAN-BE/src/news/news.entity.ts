@@ -1,44 +1,46 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('news') // Table name in the database
+@Entity('news')
 export class News {
-  @PrimaryGeneratedColumn() // Or @PrimaryColumn() with string/uuid type
-  id: number; // Or string/uuid
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ type: 'nvarchar', length: 255 })
   title: string;
 
-  @Column({ type: 'nvarchar', length: 255 })
-  category: string; // travel, culture, food, events, etc.
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  category: string;
 
-  @Column({ type: 'datetime2' }) // Store as datetime
-  date: Date; // Or appropriate date/time type for your DB
-
-  @Column({ type: 'nvarchar', length: 255 })
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
   author: string;
 
-  @Column({ default: 0 })
-  views: number; // Default 0 views when created
+  @Column({ type: 'text', nullable: true })
+  content: string;
 
-  @Column({ type: 'nvarchar', length: 255 })
-  image: string; // Path or URL of the image
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  mainImage: string;
 
-  @Column('text') // Text type for longer content
-  description: string; // Used for the list page
+  @Column({ type: 'text', nullable: true })
+  images: string;
 
-  @Column('text') // Text type for very long content (can contain HTML)
-  content: string; // Used for the detail page
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  description: string;
 
-  // Other management fields (optional but recommended)
-  @Column({ default: true })
-  isActive: boolean; // Display status
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  tags: string;
+
+  @Column({ type: 'int', default: 0 })
+  views: number;
+
+  @Column({ type: 'datetime', nullable: true })
+  date: Date;
+
+  @Column({ type: 'bit', default: true })
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  // relatedNews doesn't need to be a column in the main entity
-  // It will be handled by logic in the Service/Controller to return related data when needed
-} 
+}

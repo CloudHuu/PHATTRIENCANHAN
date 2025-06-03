@@ -18,7 +18,7 @@ export class User {
   @Column({ nullable: true })
   gender: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
   image: string;
 
   @Column({ nullable: true, type: 'date' })
@@ -37,9 +37,16 @@ export class User {
   @Column({ default: 'user' })
   role: string;
 
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  mainImage: string;
+
+  @Column({ type: 'bit', default: true })
+  isActive: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 }
+

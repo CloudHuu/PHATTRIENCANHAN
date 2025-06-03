@@ -7,10 +7,15 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { NewsModule } from './news/news.module';
 import { ToursModule } from './tours/tours.module';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -37,8 +42,6 @@ import { ToursModule } from './tours/tours.module';
     UsersModule,
     NewsModule,
     ToursModule,
-    
-
   ],
   controllers: [AppController],
   providers: [AppService],
