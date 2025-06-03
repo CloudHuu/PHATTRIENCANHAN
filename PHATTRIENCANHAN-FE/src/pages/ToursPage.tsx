@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import API_BASE_URL from '../config/api';
 
 interface TourItem {
   id: number;
@@ -26,7 +27,6 @@ const ToursPage: React.FC = () => {
   const [totalTours, setTotalTours] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  const API_BASE_URL = 'http://localhost:3000';
 
   const categories = [
     { id: 'all', name: 'Tất cả' },

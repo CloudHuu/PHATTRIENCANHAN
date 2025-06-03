@@ -144,13 +144,22 @@ const HomePage: React.FC = () => {
               <div className="text-center py-4 text-gray-600">Không tìm thấy tin tức nổi bật.</div>
             )}
             {!loadingNews && !errorNews && featuredNews.map((news) => (
+
                 <div key={news.id} className="bg-white rounded-lg shadow-md flex min-w-[300px] sm:min-w-[400px] snap-start transition-transform duration-300 ease-in-out hover:shadow-lg">
-                  <img
-                      // Access the first image in the images array
-                      src={news.images && news.images.length > 0 && news.images[0].startsWith('http') ? news.images[0] : `${API_BASE_URL}${news.images?.[0]}`}
+                   <img
+                      src={
+                        news.images && news.images.length > 0
+                          ? (news.images[0].startsWith('http')
+                              ? news.images[0]
+                              : `${API_BASE_URL}${news.images[0]}`)
+                          : '/default-image.jpg'
+                      }
                       alt={news.title}
                       className="w-1/3 object-cover rounded-l-lg"
                   />
+
+
+
                   <div className="p-4 flex-1">
                     <h3 className="text-lg font-semibold mb-2">
                       <Link
@@ -187,10 +196,15 @@ const HomePage: React.FC = () => {
             )}
             {!loadingTours && !errorTours && featuredTours.map((tour) => (
                 <div key={tour.id} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-                  <img
-                    // Access the first image in the images array
-                    src={tour.images && tour.images.length > 0 && tour.images[0].startsWith('http') ? tour.images[0] : `${API_BASE_URL}${tour.images?.[0]}`}
-                    alt={tour.name} // Assuming tour object has a 'name' field for alt text
+                 <img
+                    src={
+                      tour.images && tour.images.length > 0
+                        ? (tour.images[0].startsWith('http')
+                            ? tour.images[0]
+                            : `${API_BASE_URL}${tour.images[0]}`)
+                        : '/default-image.jpg'
+                    }
+                    alt={tour.name}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-6">
