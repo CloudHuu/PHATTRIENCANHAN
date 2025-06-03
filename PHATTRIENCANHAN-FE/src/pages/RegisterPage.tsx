@@ -3,20 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice';
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   FacebookAuthProvider,
   createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import API_BASE_URL from '../config/api';
+import {setDoc, doc} from "firebase/firestore";
+import { auth, db } from '../config/firebase'; // Adjust the import path as necessary
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const auth = getAuth();
-  const db = getFirestore();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
