@@ -1,11 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Script } from 'vm';
+import { useEffect, useRef, useState } from "react";
 
 const AboutPage: React.FC = () => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const totalSlides = 3;
+    const carouselRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % totalSlides);
+        }, 3000); // chuyển ảnh mỗi 3 giây
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (carouselRef.current) {
+            carouselRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+    }, [currentIndex]);
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Hero Section */}
             <section className="relative bg-teal-600 text-white py-16">
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="/image/lienhe.jpg"
+                        alt="Background"
+                        className="w-full h-full object-cover opacity-100"
+                    />
+                </div>
                 <div className="absolute inset-0 opacity-10">
                     <svg className="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
                         <path
@@ -23,27 +49,40 @@ const AboutPage: React.FC = () => {
             </section>
 
             {/* Company Overview */}
-            <section className="py-12">
+           <section className="py-12">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="md:w-1/2">
-                            <img
-                                src="/image/vietnam-travel.jpg"
-                                alt="Vietnam Travel"
-                                className="w-full h-64 object-cover rounded-lg shadow-md"
-                            />
-                        </div>
-                        <div className="md:w-1/2">
-                            <h2 className="text-2xl font-semibold text-teal-700 mb-4">Chúng Tôi Là Ai</h2>
-                            <p className="text-gray-600 text-base mb-4">
-                                BenThanhTourist là công ty du lịch hàng đầu tại Việt Nam, chuyên cung cấp các tour du lịch chất lượng cao, trải nghiệm văn hóa độc đáo và tin tức du lịch cập nhật. Với hơn 10 năm kinh nghiệm, chúng tôi đã mang đến niềm vui cho hàng ngàn du khách.
-                            </p>
-                            <Link
-                                to="/tours"
-                                className="inline-block px-6 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors duration-200"
+                        {/* Carousel bên trái */}
+                        <div className="md:w-1/2 relative overflow-hidden rounded-lg shadow-md">
+                            <div
+                                ref={carouselRef}
+                                className="flex transition-transform duration-700 ease-in-out w-full"
+                                style={{ width: "100%" }}
                             >
-                                Khám Phá Tour
-                            </Link>
+                                <img src="/image/sapa3.jpg" alt="Ảnh 1" className="w-full object-cover" />
+                                <img src="/image/slide22.jpg" alt="Ảnh 2" className="w-full object-cover" />
+                                <img src="/image/danang3.jpg" alt="Ảnh 3" className="w-full object-cover" />
+                            </div>
+                        </div>
+
+                        {/* Nội dung bên phải */}
+                        <div className="md:w-1/2">
+                            <h2 className="text-2xl font-semibold text-teal-700 mb-4">Giới thiệu về BenThanhTourist</h2>
+                            <p className="text-gray-600 text-base mb-4">
+                                BenThanhTourist là một trong những công ty lữ hành hàng đầu tại Việt Nam, với hơn 30 năm kinh nghiệm hoạt động trong lĩnh vực du lịch trong nước và quốc tế. Được thành lập từ năm 1989, BenThanhTourist đã xây dựng thương hiệu uy tín, chuyên cung cấp các dịch vụ:
+                            </p>
+                            <ul className="list-disc pl-5 text-gray-600 text-base mb-4 space-y-2">
+                                <li>Tour du lịch trong nước và quốc tế</li>
+                                <li>Dịch vụ vé máy bay, visa, đặt phòng khách sạn</li>
+                                <li>Tổ chức sự kiện, hội nghị, teambuilding</li>
+                                <li>Tư vấn và thiết kế tour riêng theo yêu cầu khách hàng</li>
+                            </ul>
+                            <p className="text-gray-600 text-base mb-4">
+                                Với đội ngũ nhân viên chuyên nghiệp, tận tâm và am hiểu sâu sắc về văn hóa lịch sử địa phương, BenThanhTourist cam kết mang đến cho khách hàng những trải nghiệm du lịch chất lượng, độc đáo và đầy cảm hứng.
+                            </p>
+                            <p className="text-gray-600 text-base mb-4">
+                                Chúng tôi không chỉ là đơn vị tổ chức chuyến đi, mà còn là người bạn đồng hành đáng tin cậy, giúp bạn khám phá thế giới một cách trọn vẹn và an toàn.
+                            </p>
                         </div>
                     </div>
                 </div>

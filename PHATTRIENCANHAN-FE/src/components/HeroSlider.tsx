@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const slides = [
   {
-    image: '/image/slide1.jpg',
+    image: '/image/slide1.png',
     title: 'Khám phá thế giới cùng benthanhtourist',
     subtitle: 'Cập nhật tin tức mới nhất và đặt tour du lịch chất lượng cao',
   },

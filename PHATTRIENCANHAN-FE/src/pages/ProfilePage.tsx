@@ -102,21 +102,19 @@ const ProfilePage: React.FC = () => {
   // Update editableData when user data changes (triggered after fetch or update API call)
   useEffect(() => {
     console.log('User data updated in Redux, updating editableData:', user);
-    // When user data is first fetched or updated, initialize/update editableData
-    // Prioritize user.avatar from Redux for initial load/updates, but fallback to uploaded URL if available
+
     setEditableData(prevData => ({
-      ...prevData, // Keep existing local state for other fields
+      ...prevData, 
       fullName: user?.fullName || '',
       dateOfBirth: user?.dateOfBirth || '',
       gender: user?.gender || undefined,
       phone: user?.phone || '',
-      // Use user.avatar from Redux if available, otherwise use the uploaded URL from prevData,
-      // which is set after a successful upload/save.
+
       avatarPreviewUrl: user?.avatar || prevData.avatarUrl || '', 
-      avatarUrl: user?.avatar || prevData.avatarUrl || '', // Keep the latest known avatar URL
+      avatarUrl: user?.avatar || prevData.avatarUrl || '',
       avatarFile: undefined,
     }));
-  }, [user]); // Depend on user
+  }, [user]); 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
