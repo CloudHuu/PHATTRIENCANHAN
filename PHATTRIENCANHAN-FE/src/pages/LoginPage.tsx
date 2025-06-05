@@ -51,107 +51,156 @@ const LoginPage: React.FC = () => {
     return errors;
   };
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setFormErrors({});
+const handleEmailLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
+  setFormErrors({});
 
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      setLoading(false);
-      return;
+  const errors = validateForm();
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
+    const user = userCredential.user;
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    let fullName = '';
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data.firstName || data.lastName) {
+        fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      } else if (data.fullName) {
+        fullName = data.fullName;
+      } else {
+        fullName = user.displayName || '';
+      }
+    } else {
+      fullName = user.displayName || '';
     }
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-      );
-      const user = userCredential.user;
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      fullName,
+      phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber,
+    };
 
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: userDoc.exists() ? `${userDoc.data().firstName} ${userDoc.data().lastName}` : user.displayName,
-        phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber
-      };
+    const token = await user.getIdToken();
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('accessToken', token);
+    dispatch(setCredentials({ user: userData, token }));
+    alert('Đăng nhập thành công!');
+    navigate('/');
+  } catch (err: any) {
+    console.error('Login error:', err);
+    const errorMessage =
+      err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
+        ? 'Email hoặc mật khẩu không đúng.'
+        : err.message || 'Đã xảy ra lỗi khi đăng nhập.';
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
-      alert('Đăng nhập thành công!');
-      navigate('/');
-    } catch (err: any) {
-      console.error('Login error:', err);
-      const errorMessage = err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
-          ? 'Email hoặc mật khẩu không đúng.'
-          : err.message || 'Đã xảy ra lỗi khi đăng nhập.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+const handleGoogleSignIn = async () => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    let fullName = '';
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data.firstName || data.lastName) {
+        fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      } else if (data.fullName) {
+        fullName = data.fullName;
+      } else {
+        fullName = user.displayName || '';
+      }
+    } else {
+      fullName = user.displayName || '';
     }
-  };
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    setError(null);
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      fullName,
+      phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber,
+    };
 
-    try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
+    const token = await user.getIdToken();
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('accessToken', token);
+    dispatch(setCredentials({ user: userData, token }));
+    alert('Đăng nhập với Google thành công!');
+    navigate('/');
+  } catch (err: any) {
+    console.error('Google sign-in error:', err);
+    setError(err.message || 'Đã xảy ra lỗi khi đăng nhập với Google.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: userDoc.exists() ? `${userDoc.data().firstName} ${userDoc.data().lastName}` : user.displayName,
-        phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber
-      };
+const handleFacebookSignIn = async () => {
+  setLoading(true);
+  setError(null);
 
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
-      alert('Đăng nhập với Google thành công!');
-      navigate('/');
-    } catch (err: any) {
-      console.error('Google sign-in error:', err);
-      setError(err.message || 'Đã xảy ra lỗi khi đăng nhập với Google.');
-    } finally {
-      setLoading(false);
+  try {
+    const provider = new FacebookAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    let fullName = '';
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data.firstName || data.lastName) {
+        fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+      } else if (data.fullName) {
+        fullName = data.fullName;
+      } else {
+        fullName = user.displayName || '';
+      }
+    } else {
+      fullName = user.displayName || '';
     }
-  };
 
-  const handleFacebookSignIn = async () => {
-    setLoading(true);
-    setError(null);
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      fullName,
+      phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber,
+    };
 
-    try {
-      const provider = new FacebookAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
-
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: userDoc.exists() ? `${userDoc.data().firstName} ${userDoc.data().lastName}` : user.displayName,
-        phone: userDoc.exists() ? userDoc.data().phone : user.phoneNumber
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
-      alert('Đăng nhập với Facebook thành công!');
-      navigate('/');
-    } catch (err: any) {
-      console.error('Facebook sign-in error:', err);
-      setError(err.message || 'Đã xảy ra lỗi khi đăng nhập với Facebook.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const token = await user.getIdToken();
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('accessToken', token);
+    dispatch(setCredentials({ user: userData, token }));
+    alert('Đăng nhập với Facebook thành công!');
+    navigate('/');
+  } catch (err: any) {
+    console.error('Facebook sign-in error:', err);
+    setError(err.message || 'Đã xảy ra lỗi khi đăng nhập với Facebook.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 py-12 px-4 sm:px-6 lg:px-8">

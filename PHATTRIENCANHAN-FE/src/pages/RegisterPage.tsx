@@ -98,15 +98,7 @@ const RegisterPage: React.FC = () => {
         createdAt: new Date().toISOString()
       });
 
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: `${formData.firstName} ${formData.lastName}`,
-        phone: formData.phone
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
+      // KHÔNG lưu user/token vào localStorage và KHÔNG dispatch setCredentials
       setSuccess('Đăng ký thành công! Vui lòng đăng nhập.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
@@ -136,17 +128,9 @@ const RegisterPage: React.FC = () => {
         provider: 'google'
       });
 
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        phone: user.phoneNumber
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
-      setSuccess('Đăng ký với Google thành công!');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      // KHÔNG lưu user/token vào localStorage và KHÔNG dispatch setCredentials
+      setSuccess('Đăng ký với Google thành công! Vui lòng đăng nhập.');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
       console.error('Google sign-in error:', err);
       setError(err.message || 'Đã xảy ra lỗi khi đăng ký với Google.');
@@ -174,17 +158,9 @@ const RegisterPage: React.FC = () => {
         provider: 'facebook'
       });
 
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        phone: user.phoneNumber
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      dispatch(setCredentials({ user: userData, token: await user.getIdToken() }));
-      setSuccess('Đăng ký với Facebook thành công!');
-      setTimeout(() => navigate('/dashboard'), 2000);
+      // KHÔNG lưu user/token vào localStorage và KHÔNG dispatch setCredentials
+      setSuccess('Đăng ký với Facebook thành công! Vui lòng đăng nhập.');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
       console.error('Facebook sign-in error:', err);
       setError(err.message || 'Đã xảy ra lỗi khi đăng ký với Facebook.');
