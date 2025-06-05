@@ -28,7 +28,7 @@ const AboutPage: React.FC = () => {
                     <div className="flex flex-col md:flex-row items-center gap-8">
                         <div className="md:w-1/2">
                             <img
-                                src="/image/vietnam-travel.jpg"
+                                src="/image/vntravel.jpg"
                                 alt="Vietnam Travel"
                                 className="w-full h-64 object-cover rounded-lg shadow-md"
                             />
@@ -65,37 +65,43 @@ const AboutPage: React.FC = () => {
                     <h2 className="text-2xl font-semibold text-teal-700 mb-8 text-center">Đội Ngũ Của Chúng Tôi</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Team Member 1 */}
-                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center">
-                            <img
-                                src="/image/team1.jpg"
-                                alt="Team Member"
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="p-5">
-                                <h3 className="text-lg font-semibold text-gray-800">Nguyễn Văn An</h3>
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center flex flex-col h-full">
+                            <div className="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                <img
+                                    src="/image/2.jpg"
+                                    alt="Team Member"
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="p-5 flex-1 flex flex-col justify-end">
+                                <h3 className="text-lg font-semibold text-gray-800">Phan Ngọc Hữu</h3>
                                 <p className="text-gray-600 text-sm">Giám đốc Điều hành</p>
                             </div>
                         </div>
                         {/* Team Member 2 */}
-                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center">
-                            <img
-                                src="/image/team2.jpg"
-                                alt="Team Member"
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="p-5">
-                                <h3 className="text-lg font-semibold text-gray-800">Trần Thị Bình</h3>
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center flex flex-col h-full">
+                            <div className="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                <img
+                                    src="/image/3.jpg"
+                                    alt="Team Member"
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="p-5 flex-1 flex flex-col justify-end">
+                                <h3 className="text-lg font-semibold text-gray-800">Trương Quang Minh</h3>
                                 <p className="text-gray-600 text-sm">Quản lý Tour</p>
                             </div>
                         </div>
                         {/* Team Member 3 */}
-                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center">
-                            <img
-                                src="/image/team3.jpg"
-                                alt="Team Member"
-                                className="w-full h-48 object-cover"
-                            />
-                            <div className="p-5">
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden text-center flex flex-col h-full">
+                            <div className="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
+                                <img
+                                    src="/image/4.jpg"
+                                    alt="Team Member"
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="p-5 flex-1 flex flex-col justify-end">
                                 <h3 className="text-lg font-semibold text-gray-800">Lê Minh Châu</h3>
                                 <p className="text-gray-600 text-sm">Chuyên viên Marketing</p>
                             </div>

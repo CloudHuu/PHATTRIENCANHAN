@@ -10,6 +10,8 @@ interface User {
   image?: string;
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other';
+  introduction?: string;
+
 }
 
 interface AuthState {
@@ -34,6 +36,18 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ user: any; token: string }>
     ) => {
+      // Lấy introduction cũ từ localStorage nếu có
+      let oldIntroduction = '';
+      try {
+        const oldUserStr = localStorage.getItem('user');
+        if (oldUserStr) {
+          const oldUser = JSON.parse(oldUserStr);
+          if (oldUser.email === action.payload.user.email && oldUser.introduction) {
+            oldIntroduction = oldUser.introduction;
+          }
+        }
+      } catch {}
+
       state.user = {
         id: action.payload.user.id,
         email: action.payload.user.email,
@@ -43,6 +57,7 @@ const authSlice = createSlice({
         avatar: action.payload.user.image,
         dateOfBirth: action.payload.user.dateOfBirth,
         gender: action.payload.user.gender,
+        introduction: action.payload.user.introduction ?? oldIntroduction, // Ưu tiên dữ liệu mới, nếu không có thì lấy local
       };
       state.token = action.payload.token;
       state.isAuthenticated = true;
@@ -67,4 +82,4 @@ const authSlice = createSlice({
 });
 
 export const { setCredentials, logout, setLoading, updateUserProfile } = authSlice.actions;
-export default authSlice.reducer; 
+export default authSlice.reducer;

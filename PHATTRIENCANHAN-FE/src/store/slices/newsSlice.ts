@@ -9,6 +9,7 @@ interface News {
   author: string;
   date: string;
   views: number;
+  
 }
 
 interface NewsState {

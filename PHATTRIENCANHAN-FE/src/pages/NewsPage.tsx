@@ -1,112 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import API_BASE_URL from '../config/api';
+import { newsSampleData } from '../mocks/newsSampleData';
 
-// Assuming NewsItem structure matches the selected fields from backend News entity for the list view
 interface NewsItem {
-  id: number; // Backend returns number, frontend might use string from URL
+  id: number;
   title: string;
   category: string;
-  date: string; // Backend returns Date, might need formatting in frontend or return string from BE
-  image: string;
+  date: string;
+  images: string[];
   description: string;
   author: string;
   views: number;
 }
 
 interface Category {
-  id: string; // Corresponds to category string from backend
+  id: string;
   name: string;
 }
 
 const NewsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Number of news items per page
-
-  const [allNews, setAllNews] = useState<NewsItem[]>([]); // State to hold all fetched news data
-  const [loading, setLoading] = useState(true); // State to handle loading status
-  const [error, setError] = useState<string | null>(null); // State to handle errors
-
+  const itemsPerPage = 6;
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const categories: Category[] = [
     { id: 'all', name: 'Tất cả' },
-    // Ensure these IDs match the category values returned by backend
     { id: 'travel', name: 'Du lịch' },
     { id: 'culture', name: 'Văn hóa' },
     { id: 'food', name: 'Ẩm thực' },
     { id: 'events', name: 'Sự kiện' },
   ];
 
-  // Effect to fetch news when the component mounts or selectedCategory changes
+  // Hàm trả về class màu cho từng category
+  const getCategoryClass = (category: string) => {
+    switch (category) {
+      case 'travel':
+      case 'Du lịch':
+        return 'bg-blue-100 text-blue-700';
+      case 'culture':
+      case 'Văn hóa':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'food':
+      case 'Ẩm thực':
+        return 'bg-green-100 text-green-700';
+      case 'events':
+      case 'Sự kiện':
+        return 'bg-pink-100 text-pink-700';
+      case 'all':
+      case 'Tất cả':
+        return 'bg-gray-200 text-gray-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Call the backend API to fetch news
-        // Backend findAll currently does not support filtering, so fetch all and filter on frontend.
-        // If backend adds filter support, update this API call.
-        const response = await fetch(`${API_BASE_URL}/news`);
+    setLoading(true);
+    setError(null);
+    setTimeout(() => {
+      setAllNews(newsSampleData);
+      setLoading(false);
+    }, 400);
+  }, []);
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const data: NewsItem[] = await response.json();
-        console.log('Fetched news data:', data);
-
-        // Store all fetched news, filtering will be applied later for display
-        setAllNews(data);
-        setLoading(false);
-
-      } catch (err: any) {
-        console.error('Error fetching news:', err);
-        setError('Không thể tải danh sách tin tức. Vui lòng thử lại sau.');
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, []); // Empty dependency array: fetch all news once on mount
-
-  // Apply category filter to all fetched news whenever allNews or selectedCategory changes
   const filteredNews = selectedCategory === 'all' ? allNews : allNews.filter(news => news.category === selectedCategory);
 
-  // Pagination logic applied to filtered news
   const totalItems = filteredNews.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentNews = filteredNews.slice(startIndex, endIndex);
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  const handlePageChange = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // Reset page to 1 when category filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory]);
 
-  // Generate page numbers for pagination controls
   const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
 
-  // Get category name for displaying
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
-    return category ? category.name : categoryId; // Fallback to ID if name not found
+    return category ? category.name : categoryId;
   };
 
-  // Thêm hàm lấy ảnh đại diện
   const getNewsImage = (news: any) => {
     if (news.images && news.images.length > 0) return news.images[0];
-    if (news.mainImage) return news.mainImage;
-    if (news.image) return news.image;
     return '/default-image.jpg';
   };
 
@@ -128,13 +111,10 @@ const NewsPage = () => {
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => {
-                setSelectedCategory(category.id);
-                // setCurrentPage(1); // Already handled by effect above
-              }}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${selectedCategory === category.id
-                ? 'bg-teal-600 text-white shadow-sm'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-teal-100'
+              onClick={() => setSelectedCategory(category.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 border ${selectedCategory === category.id
+                ? `${getCategoryClass(category.id)} shadow-sm border-transparent`
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-teal-100'
                 }`}
             >
               {category.name}
@@ -152,39 +132,23 @@ const NewsPage = () => {
           {!loading && !error && currentNews.map((news) => (
             <div key={news.id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-200 hover:shadow-lg hover:-translate-y-1">
               <img
-                src={
-                  getNewsImage(news).startsWith('http')
-                    ? getNewsImage(news)
-                    : `${API_BASE_URL}${getNewsImage(news)}`
-                }
+                src={getNewsImage(news)}
                 alt={news.title}
                 className="w-full h-40 object-cover"
               />
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  {/* Display category name based on ID */}
-                  <span className={`px-2 py-1 ${news.category === 'travel' ? 'bg-orange-100 text-orange-800' :
-                    news.category === 'culture' ? 'bg-yellow-100 text-yellow-700' :
-                      news.category === 'food' ? 'bg-red-100 text-red-700' :
-                        news.category === 'events' ? 'bg-purple-100 text-purple-700' : ''
-                    } rounded-full text-xs`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryClass(news.category)}`}>
                     {getCategoryName(news.category)}
                   </span>
-                  {/* Display formatted date - assuming backend returns string or Date object */}
-                  <span className="text-xs text-gray-500">{news.date}</span> {/* You might need date formatting here */}
+                  <span className="text-xs text-gray-500">{news.date}</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2 line-clamp-2">
-                  {/* Link to news detail page */}
-                  <Link
-                    to={`/news/${news.id}`}
-                    className="text-gray-800 hover:text-teal-600 transition-colors duration-200"
-                  >
+                  <Link to={`/news/${news.id}`} className="text-gray-800 hover:text-teal-600 transition-colors duration-200">
                     {news.title}
                   </Link>
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-3">
-                  {news.description}
-                </p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-3">{news.description}</p>
                 <div className="flex items-center text-gray-500 text-sm">
                   <span className="mr-4">Tác giả: {news.author}</span>
                   <span>{news.views} lượt xem</span>

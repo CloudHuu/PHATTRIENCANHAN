@@ -1,16 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Tour {
-  id: string;
-  title: string;
+  id: number;
+  name: string;
   description: string;
   price: number;
-  duration: number;
+  duration: number; // Số ngày
   location: string;
-  image: string;
-  category: string;
-  rating: number;
-  reviews: number;
+  images: string[]; // Mảng ảnh
+  highlights?: string[];
+  included?: string[];
+  excluded?: string[];
+  isActive?: boolean;
+  isNew?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface TourState {
@@ -47,4 +51,4 @@ const tourSlice = createSlice({
 });
 
 export const { setTours, setSelectedTour, setLoading, setError } = tourSlice.actions;
-export default tourSlice.reducer; 
+export default tourSlice.reducer;

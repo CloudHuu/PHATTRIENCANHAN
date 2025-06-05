@@ -137,8 +137,17 @@ const ContactPage: React.FC = () => {
                             </ul>
                             <div className="mt-6">
                                 <h3 className="text-lg font-semibold text-teal-700 mb-3">Tìm Chúng Tôi</h3>
-                                <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
-                                    <p className="text-gray-500">Bản đồ Google Maps (Placeholder)</p>
+                                <div className="bg-gray-200 rounded-lg overflow-hidden">
+                                    <iframe
+                                        title="Google Maps"
+                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.502427839014!2d106.70042307587637!3d10.773374259222073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3eafc7b0b3%3A0x6e7b8b2e4e6c7e7b!2zQ8O0bmcgdHkgQ-G7lSBwaOG6p24gQmVuIFRoYW5oIFRvdXJpc3Q!5e0!3m2!1svi!2s!4v1717740000000!5m2!1svi!2s"
+                                        width="100%"
+                                        height="192"
+                                        style={{ border: 0 }}
+                                        allowFullScreen={true}
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    ></iframe>
                                 </div>
                             </div>
                         </div>

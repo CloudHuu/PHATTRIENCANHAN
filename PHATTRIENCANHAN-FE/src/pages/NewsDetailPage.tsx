@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-const API_BASE_URL = 'http://localhost:3000';
+import { newsSampleData } from '../mocks/newsSampleData';
 
-// Cập nhật interface: images là mảng
 interface NewsDetailItem {
   id: number;
   title: string;
@@ -10,10 +9,33 @@ interface NewsDetailItem {
   date: string;
   author: string;
   views: number;
-  images: string[]; // Sử dụng images thay cho image
+  images: string[];
   content: string;
   relatedNews?: { id: number; title: string; images: string[]; date: string }[];
 }
+
+// Hàm trả về class màu cho từng category
+const getCategoryClass = (category: string) => {
+  switch (category) {
+    case 'travel':
+    case 'Du lịch':
+      return 'bg-blue-100 text-blue-700';
+    case 'culture':
+    case 'Văn hóa':
+      return 'bg-yellow-100 text-yellow-700';
+    case 'food':
+    case 'Ẩm thực':
+      return 'bg-green-100 text-green-700';
+    case 'events':
+    case 'Sự kiện':
+      return 'bg-pink-100 text-pink-700';
+    case 'all':
+    case 'Tất cả':
+      return 'bg-gray-200 text-gray-700';
+    default:
+      return 'bg-gray-100 text-gray-700';
+  }
+};
 
 const NewsDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,44 +44,31 @@ const NewsDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchNewsDetail = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`${API_BASE_URL}/news/${id}`);
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-        }
-        const data: NewsDetailItem = await response.json();
-        setNews(data);
-        setLoading(false);
-      } catch (err: any) {
-        setError('Không thể tải chi tiết tin tức. Vui lòng thử lại sau.');
-        setLoading(false);
+    setLoading(true);
+    setError(null);
+    setTimeout(() => {
+      const found = newsSampleData.find(n => n.id === Number(id));
+      if (found) {
+        setNews({
+          ...found,
+          content: (found as any).content ?? '',
+          relatedNews: (found as any).relatedNews ?? [],
+        });
+      } else {
+        setNews(null);
+        setError('Không tìm thấy tin tức.');
       }
-    };
-
-    if (id) {
-      fetchNewsDetail();
-    } else {
-      setError('Không tìm thấy ID tin tức trong URL.');
       setLoading(false);
-    }
+    }, 300);
   }, [id]);
 
   if (loading) return <div className="text-center py-12">Đang tải chi tiết tin tức...</div>;
   if (error) return <div className="text-center py-12 text-red-500">Lỗi: {error}</div>;
   if (!news) return <div className="text-center py-12">Không tìm thấy tin tức.</div>;
 
-  // Lấy ảnh đầu tiên nếu có
   const mainImage =
     news.images && news.images.length > 0
-      ? (news.images[0].startsWith('http')
-          ? news.images[0]
-          : news.images[0].startsWith('/')
-            ? news.images[0]
-            : `/${news.images[0]}`)
+      ? news.images[0]
       : '/default-image.jpg';
 
   return (
@@ -89,7 +98,9 @@ const NewsDetailPage: React.FC = () => {
               />
               <div className="p-8">
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">{news.category}</span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryClass(news.category)}`}>
+                    {news.category}
+                  </span>
                   <span className="text-sm text-gray-500">{news.date}</span>
                   <span className="text-sm text-gray-500">Tác giả: {news.author}</span>
                   <span className="text-sm text-gray-500">{news.views} lượt xem</span>
@@ -112,11 +123,7 @@ const NewsDetailPage: React.FC = () => {
                   {news.relatedNews.map((item) => {
                     const relatedImage =
                       item.images && item.images.length > 0
-                        ? (item.images[0].startsWith('http')
-                            ? item.images[0]
-                            : item.images[0].startsWith('/')
-                              ? item.images[0]
-                              : `/${item.images[0]}`)
+                        ? item.images[0]
                         : '/default-image.jpg';
                     return (
                       <Link

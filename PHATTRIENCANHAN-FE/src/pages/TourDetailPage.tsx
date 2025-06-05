@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import API_BASE_URL from '../config/api'; // Thêm dòng này
+import { toursSampleData } from '../mocks/toursSampleData'; // Sử dụng dữ liệu tĩnh
 
 // Define the type for tour detail data based on backend entity
 interface TourDetail {
@@ -32,38 +32,26 @@ const TourDetailPage: React.FC = () => {
 
   // Effect to fetch tour detail when the component mounts or id changes
   useEffect(() => {
-    const fetchTourDetail = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Call the backend API to fetch tour detail by id
-        const response = await fetch(`${API_BASE_URL}/tours/${id}`);
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const data: TourDetail = await response.json();
-        console.log('Fetched tour detail:', data);
-
-        setTour(data); // Set fetched data
-        setLoading(false);
-
-      } catch (err: any) {
-        console.error('Error fetching tour detail:', err);
-        setError('Không thể tải chi tiết tour. Vui lòng thử lại sau.');
-        setLoading(false);
+    setLoading(true);
+    setError(null);
+    setTimeout(() => {
+      const found = toursSampleData.find(t => t.id === Number(id));
+      if (found) {
+        setTour({
+          ...found,
+          title: found.name, // hoặc chuỗi rỗng nếu không có
+          isActive: true,
+          isNew: false,
+          createdAt: '',
+          updatedAt: ''
+        });
+        setError(null);
+      } else {
+        setTour(null);
+        setError('Không tìm thấy tour.');
       }
-    };
-
-    if (id) {
-      fetchTourDetail();
-    } else {
-      // Handle case where id is not present in URL (shouldn't happen with proper routing)
-      setError('Không tìm thấy ID tour trong URL.');
       setLoading(false);
-    }
+    }, 300);
   }, [id]); // Rerun effect when id changes
 
   // Show loading, error, or not found state
@@ -96,7 +84,7 @@ const TourDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
               {tour.images && tour.images.length > 0 ? (
                   <img
-                      src={`${API_BASE_URL}${tour.images[0]}`}
+                      src={tour.images[0]}
                       alt={tour.name}
                       className="w-full h-96 object-cover"
                   />
@@ -200,4 +188,4 @@ const TourDetailPage: React.FC = () => {
   );
 };
 
-export default TourDetailPage; 
+export default TourDetailPage;
