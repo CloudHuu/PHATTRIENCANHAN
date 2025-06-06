@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth } from '../config/firebase';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 
 const ChangePasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,47 +64,30 @@ const ChangePasswordPage: React.FC = () => {
     }
 
     try {
-      // TODO: Replace with your actual backend API URL for changing password
-      // You will likely need to include the user's token in the Authorization header
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-          setError('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
-          setLoading(false);
-          return;
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        setError('Bạn chưa đăng nhập.');
+        setLoading(false);
+        return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/change-password', { // Example API endpoint
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Include token
-        },
-        body: JSON.stringify({
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
-        }),
-      });
+      // Re-authenticate
+      const credential = EmailAuthProvider.credential(
+          user.email,
+          formData.currentPassword
+      );
+      await reauthenticateWithCredential(user, credential);
 
-      const data = await response.json();
+      // Update password
+      await updatePassword(user, formData.newPassword);
 
-      if (!response.ok) {
-        const errorMessage = data && typeof data === 'object' && data.message ? data.message : 'Đổi mật khẩu thất bại.';
-        throw new Error(errorMessage);
-      }
-
-      console.log('Password change successful:', data);
       setSuccess('Đổi mật khẩu thành công!');
-      // Optional: Redirect user after success
-      // setTimeout(() => { navigate('/profile'); }, 2000);
-
     } catch (err: any) {
-      console.error('Password change error:', err);
       setError(err.message || 'Đã xảy ra lỗi khi đổi mật khẩu.');
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-xl">
