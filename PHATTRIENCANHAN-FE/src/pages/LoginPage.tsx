@@ -271,7 +271,7 @@ const handleFacebookSignIn = async () => {
 
               <div className="text-sm">
                 <Link
-                    to="/forgot-password"
+                    to="/forget-password"
                     className="font-medium text-primary hover:text-primary-dark transition-colors duration-300"
                 >
                   Quên mật khẩu?

@@ -23,6 +23,7 @@ import RegisterPage from './pages/RegisterPage';
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="news/:id" element={<NewsDetailPage />} />
               <Route path="tours" element={<ToursPage />} />
               <Route path="tours/:id" element={<TourDetailPage />} />
+              <Route path={"forget-password"} element={<ForgetPasswordPage />} />
               <Route path={"about"} element={<AboutPage/>} />
               <Route path={"contacts"} element={<ContactPage/>} />
               <Route path="booking/:tourId" element={<BookingPage />} />
