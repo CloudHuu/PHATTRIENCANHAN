@@ -71,16 +71,17 @@ const ChangePasswordPage: React.FC = () => {
         return;
       }
 
-      // Re-authenticate
-      const credential = EmailAuthProvider.credential(
-          user.email,
-          formData.currentPassword
-      );
+      const providerIds = user.providerData.map((data) => data.providerId);
+      if (providerIds.includes('google.com') || providerIds.includes('facebook.com')) {
+        setError('Tài khoản này sử dụng Google hoặc Facebook để đăng nhập. Vui lòng đổi mật khẩu trên trang của nhà cung cấp.');
+        setLoading(false);
+        return;
+      }
+
+      // Tiếp tục với logic re-authenticate và updatePassword cho Email/Password
+      const credential = EmailAuthProvider.credential(user.email, formData.currentPassword);
       await reauthenticateWithCredential(user, credential);
-
-      // Update password
       await updatePassword(user, formData.newPassword);
-
       setSuccess('Đổi mật khẩu thành công!');
     } catch (err: any) {
       setError(err.message || 'Đã xảy ra lỗi khi đổi mật khẩu.');
@@ -88,6 +89,7 @@ const ChangePasswordPage: React.FC = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow-xl">
