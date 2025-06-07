@@ -6,7 +6,9 @@ export const toursSampleData = [
     images: ["/image/danang.jpg"],
     price: 3500000,
     duration: 3,
-    location: "Tour trong nước"
+    location: "Tour trong nước",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 2,
@@ -15,7 +17,9 @@ export const toursSampleData = [
     images: ["/image/NhaTrang.png"],
     price: 4200000,
     duration: 4,
-    location: "Tour biển"
+    location: "Tour biển",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 3,
@@ -24,7 +28,9 @@ export const toursSampleData = [
     images: ["/image/sâp.jpg"],
     price: 3900000,
     duration: 3,
-    location: "Tour núi"
+    location: "Tour núi",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 4,
@@ -33,7 +39,9 @@ export const toursSampleData = [
     images: ["/image/HaLong.png"],
     price: 3200000,
     duration: 2,
-    location: "Tour biển"
+    location: "Tour biển",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 5,
@@ -42,7 +50,9 @@ export const toursSampleData = [
     images: ["/image/PhuQuoc.png"],
     price: 4700000,
     duration: 4,
-    location: "Tour biển"
+    location: "Tour biển",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 6,
@@ -51,7 +61,9 @@ export const toursSampleData = [
     images: ["/image/hanoi.png  "],
     price: 3100000,
     duration: 3,
-    location: "Tour trong nước"
+    location: "Tour trong nước",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 7,
@@ -60,7 +72,9 @@ export const toursSampleData = [
     images: ["/image/hue.jpg"],
     price: 2800000,
     duration: 2,
-    location: "Tour trong nước"
+    location: "Tour trong nước",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 8,
@@ -69,7 +83,9 @@ export const toursSampleData = [
     images: ["/image/dalat.png"],
     price: 3400000,
     duration: 3,
-    location: "Tour núi"
+    location: "Tour núi",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 9,
@@ -78,7 +94,9 @@ export const toursSampleData = [
     images: ["/image/cantho.jpg"],
     price: 2700000,
     duration: 2,
-    location: "Tour trong nước"
+    location: "Tour trong nước",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 10,
@@ -87,7 +105,9 @@ export const toursSampleData = [
     images: ["/image/quangbinh.jpg"],
     price: 3600000,
     duration: 3,
-    location: "Tour núi"
+    location: "Tour núi",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 11,
@@ -96,7 +116,9 @@ export const toursSampleData = [
     images: ["/image/ninhbinh.jpg"],
     price: 2900000,
     duration: 2,
-    location: "Tour núi"
+    location: "Tour núi",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 12,
@@ -105,7 +127,9 @@ export const toursSampleData = [
     images: ["/image/quynhon.jpg"],
     price: 3300000,
     duration: 3,
-    location: "Tour biển"
+    location: "Tour biển",
+        views: 0 // Thêm trường này
+
   },
   {
     id: 13,
@@ -114,6 +138,8 @@ export const toursSampleData = [
     images: ["/image/vungtau.jpg"],
     price: 2500000,
     duration: 2,
-    location: "Tour biển"
+    location: "Tour biển",
+        views: 0 // Thêm trường này
+
   }
 ];

@@ -5,9 +5,9 @@ interface Tour {
   name: string;
   description: string;
   price: number;
-  duration: number; // Số ngày
+  duration: number;
   location: string;
-  images: string[]; // Mảng ảnh
+  images: string[];
   highlights?: string[];
   included?: string[];
   excluded?: string[];
@@ -15,6 +15,7 @@ interface Tour {
   isNew?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  views: number; // Thêm trường views
 }
 
 interface TourState {
@@ -47,8 +48,16 @@ const tourSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    // Thêm reducer tăng lượt xem
+    incrementTourViews: (state, action: PayloadAction<number>) => {
+      const tourId = action.payload;
+      const tourItem = state.tours.find(t => t.id === tourId);
+      if (tourItem) {
+        tourItem.views = (tourItem.views || 0) + 1;
+      }
+    },
   },
 });
 
-export const { setTours, setSelectedTour, setLoading, setError } = tourSlice.actions;
+export const { setTours, setSelectedTour, setLoading, setError, incrementTourViews } = tourSlice.actions;
 export default tourSlice.reducer;

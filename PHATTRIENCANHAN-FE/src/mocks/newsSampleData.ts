@@ -7,7 +7,7 @@ export const newsSampleData = [
     images: ["/image/danangnews.jpg"],
     description: "Đà Nẵng thu hút hàng ngàn du khách với nhiều sự kiện hấp dẫn.",
     author: "Nguyễn Văn A",
-    views: 1200
+    views: 0
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ export const newsSampleData = [
     images: ["/image/amthucmientrung.jpg"],
     description: "Các món ăn miền Trung được vinh danh trên bản đồ ẩm thực Việt.",
     author: "Trần Thị B",
-    views: 980
+    views: 0
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ export const newsSampleData = [
     images: ["/image/lehoiphaohoa.jpg"],
     description: "Sự kiện pháo hoa quốc tế thu hút đông đảo du khách.",
     author: "Lê Văn C",
-    views: 1500
+    views: 0
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ export const newsSampleData = [
     images: ["/image/vanhoataynguyen.jpg"],
     description: "Lễ hội cồng chiêng và nét đẹp văn hóa Tây Nguyên.",
     author: "Phạm Thị D",
-    views: 870
+    views: 0
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ export const newsSampleData = [
     images: ["/image/amthucduongphosg.jpg"],
     description: "Khám phá những món ăn đường phố hấp dẫn tại Sài Gòn.",
     author: "Ngô Văn E",
-    views: 1100
+    views: 0
   },
   {
     id: 6,
@@ -57,7 +57,7 @@ export const newsSampleData = [
     images: ["/image/biennewphuquoc.jpg"],
     description: "Trải nghiệm biển xanh, cát trắng và nắng vàng ở Phú Quốc.",
     author: "Lê Thị F",
-    views: 950
+    views: 0
   },
   {
     id: 7,
@@ -67,7 +67,7 @@ export const newsSampleData = [
     images: ["/image/lehoihoadalat.jpg"],
     description: "Đà Lạt rực rỡ sắc hoa trong mùa lễ hội.",
     author: "Trần Văn G",
-    views: 1050
+    views: 0
   },
   {
     id: 8,
@@ -77,7 +77,7 @@ export const newsSampleData = [
     images: ["/image/hangsondong.jpg"],
     description: "Hang động lớn nhất thế giới tại Quảng Bình.",
     author: "Phạm Thị H",
-    views: 990
+    views: 0
   },
   {
     id: 9,
@@ -87,7 +87,7 @@ export const newsSampleData = [
     images: ["/image/tns.jpg"],
     description: "Những món ăn đặc trưng của vùng sông nước.",
     author: "Nguyễn Văn I",
-    views: 870
+    views: 0
   },
   {
     id: 10,
@@ -97,7 +97,7 @@ export const newsSampleData = [
     images: ["/image/duathuyen.jpg"],
     description: "Sôi động cùng lễ hội đua thuyền truyền thống trên sông Hương.",
     author: "Lê Thị K",
-    views: 920
+    views: 0
   },
   {
     id: 11,
@@ -107,7 +107,7 @@ export const newsSampleData = [
     images: ["/image/phocohoian.jpg"],
     description: "Vẻ đẹp cổ kính và lung linh đèn lồng Hội An.",
     author: "Trần Văn L",
-    views: 1010
+    views: 0
   },
   {
     id: 12,
@@ -117,7 +117,7 @@ export const newsSampleData = [
     images: ["/image/xuavanay.jpg"],
     description: "Những món ăn truyền thống và hiện đại của Hà Nội.",
     author: "Ngô Thị M",
-    views: 980
+    views: 0
   },
   {
     id: 13,
@@ -127,7 +127,7 @@ export const newsSampleData = [
     images: ["/image/spass.jpg"],
     description: "Ngắm ruộng bậc thang vàng óng ở Sa Pa.",
     author: "Phạm Văn N",
-    views: 970
+    views: 0
   },
   {
     id: 14,
@@ -137,7 +137,7 @@ export const newsSampleData = [
     images: ["/image/phoahoa.jpeg"],
     description: "Huế rực rỡ trong đêm hội pháo hoa quốc tế.",
     author: "Lê Thị O",
-    views: 930
+    views: 0
   },
   {
     id: 15,
@@ -147,6 +147,6 @@ export const newsSampleData = [
     images: ["/image/champaa.jpg"],
     description: "Nét độc đáo của văn hóa Chăm Pa ở miền Trung.",
     author: "Nguyễn Văn P",
-    views: 860
+    views: 0
   }
 ];
