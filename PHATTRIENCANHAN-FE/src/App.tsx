@@ -24,6 +24,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -35,14 +36,16 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<MainLayout />}>
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
               <Route index element={<HomePage />} />
               <Route path="news" element={<NewsPage />} />
               <Route path="news/:id" element={<NewsDetailPage />} />
               <Route path="tours" element={<ToursPage />} />
               <Route path="tours/:id" element={<TourDetailPage />} />
               <Route path={"forget-password"} element={<ForgetPasswordPage />} />
-              <Route path={"about"} element={<AboutPage/>} />
-              <Route path={"contacts"} element={<ContactPage/>} />
+              <Route path={"about"} element={<AboutPage />} />
+              <Route path={"contacts"} element={<ContactPage />} />
               <Route path="booking/:tourId" element={<BookingPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="change-password" element={<ChangePasswordPage />} />
